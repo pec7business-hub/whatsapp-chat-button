@@ -2,11 +2,12 @@
 {
   "name": "WhatsApp In-Page",
   "target": "section",
+  "javascript": "whatsapp-product.js",
   "settings": []
 }
 {% endschema %}
 
-<div id="wa-product-button-container" style="display: none; margin-top: 15px; margin-bottom: 15px; width: 100%;">
+<div id="wa-product-button-container" style="display: none; margin-top: 15px; margin-bottom: 15px; width: 100%;" data-product-title="{{ product.title | escape }}">
   <a id="wa-product-button" href="#" target="_blank" style="
     display: flex;
     justify-content: center;
@@ -37,68 +38,3 @@
     transform: scale(0.98);
   }
 </style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", async function () {
-    const shop = window.Shopify && window.Shopify.shop;
-    if (!shop) return;
-
-    const apiUrl = "https://whatsapp-chat-button-production-1271.up.railway.app";
-    
-    let config;
-    try {
-      const res = await fetch(`${apiUrl}/api/widget-config/${shop}`);
-      if (!res.ok) return;
-      config = await res.json();
-    } catch (e) {
-      return;
-    }
-
-    if (!config.isEnabled || !config.productButtonEnabled) return;
-
-    const container = document.getElementById("wa-product-button-container");
-    const button = document.getElementById("wa-product-button");
-    const textSpan = document.getElementById("wa-product-button-text");
-
-    // Apply color and text
-    const color = config.buttonColor || "#25D366";
-    button.style.backgroundColor = color;
-    textSpan.textContent = config.productButtonLabel || "Chiedi su WhatsApp";
-
-    // Build standard WhatsApp URL
-    const buildWaUrl = (phone, msg) => {
-      const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
-      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
-    };
-
-    const targetPhone = config.phoneNumber || "";
-    
-    // Add product name and URL to default message
-    const productName = "{{ product.title | escape | replace: '\"', '\\\"' }}";
-    const productUrl = window.location.href;
-    let baseMessage = config.defaultMessage || "";
-    if (baseMessage) baseMessage += "\n\n";
-    baseMessage += `Sono interessato a: ${productName}\n${productUrl}`;
-
-    if (!config.isAvailable) {
-      button.style.filter = "grayscale(100%)";
-      button.style.opacity = "0.7";
-      button.href = buildWaUrl(targetPhone, config.offlineMessage || "");
-      button.removeAttribute("target");
-    } else {
-      button.href = buildWaUrl(targetPhone, baseMessage);
-
-      // Track click
-      button.addEventListener("click", () => {
-        fetch(`${apiUrl}/api/track-click`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shop, deviceType: window.innerWidth <= 768 ? "mobile" : "desktop", page: window.location.pathname }),
-        }).catch(() => {});
-      });
-    }
-
-    // Show button
-    container.style.display = "block";
-  });
-</script>
