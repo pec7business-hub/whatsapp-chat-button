@@ -61,6 +61,9 @@ export async function loader({ params }) {
         let agents = [];
         try { agents = JSON.parse(settings.agents || "[]"); } catch { }
 
+        let faqItems = [];
+        try { faqItems = JSON.parse(settings.faqItems || "[]"); } catch { }
+
         return json({
             isEnabled: true,
             isAvailable,
@@ -78,6 +81,8 @@ export async function loader({ params }) {
             marginSide: settings.marginSide,
             animation: settings.animation,
             agents,
+            faqEnabled: settings.faqEnabled,
+            faqItems,
             plan: settings.plan,
             language: settings.language || "en",
             productMessageTemplate: settings.productMessageTemplate || "Hi! I'm interested in: {{product}}",

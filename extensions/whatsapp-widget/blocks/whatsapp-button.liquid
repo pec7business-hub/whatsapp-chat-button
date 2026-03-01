@@ -18,6 +18,15 @@
     <p id="whatsapp-popup-title"></p>
     <div id="whatsapp-agent-list"></div>
   </div>
+
+  <!-- FAQ popup (hidden by default) -->
+  <div id="whatsapp-faq-popup" style="display:none;" role="dialog" aria-label="FAQ">
+    <div id="whatsapp-faq-title">Domande Frequenti</div>
+    <div id="whatsapp-faq-list"></div>
+    <div class="whatsapp-faq-footer">
+      <a href="#" id="whatsapp-faq-agent-btn">Oppure parla con un operatore</a>
+    </div>
+  </div>
 </div>
 
 <!-- Offline badge (hidden by default) -->
@@ -150,6 +159,61 @@
   .whatsapp-agent-info { flex: 1; min-width: 0; }
   .whatsapp-agent-name { font-size: 13px; font-weight: 600; color: #111; }
   .whatsapp-agent-role { font-size: 11px; color: #888; }
+  
+  #whatsapp-faq-popup {
+    display: none;
+    position: absolute;
+    width: 280px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transform-origin: bottom right;
+    animation: agent-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  
+  #whatsapp-faq-title {
+    background: #075e54;
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 16px;
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  #whatsapp-faq-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .whatsapp-faq-item {
+    display: block;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: #111;
+    font-size: 13px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  
+  .whatsapp-faq-item:hover { background: #f9f9f9; }
+  .whatsapp-faq-item:last-child { border-bottom: none; }
+  
+  .whatsapp-faq-footer {
+    padding: 10px;
+    text-align: center;
+    background: #f7f7f7;
+    border-top: 1px solid #eaeaea;
+  }
+  
+  #whatsapp-faq-agent-btn {
+    color: #075e54;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 500;
+  }
 </style>
 
 <script>
@@ -172,12 +236,12 @@
 
     // Language translations
     const translations = {
-      it: { chooseAgent: "Scegli con chi parlare", offline: "Offline", tooltip: "Chatta con noi!" },
-      en: { chooseAgent: "Choose who to talk to", offline: "Offline", tooltip: "Chat with us!" },
-      es: { chooseAgent: "Elige con quién hablar", offline: "Desconectado", tooltip: "¡Chatea con nosotros!" },
-      de: { chooseAgent: "Wähle deinen Ansprechpartner", offline: "Offline", tooltip: "Chatte mit uns!" },
-      fr: { chooseAgent: "Choisissez votre interlocuteur", offline: "Hors ligne", tooltip: "Discutez avec nous !" },
-      pt: { chooseAgent: "Escolha com quem falar", offline: "Offline", tooltip: "Fale conosco!" },
+      it: { chooseAgent: "Scegli con chi parlare", offline: "Offline", tooltip: "Chatta con noi!", faqTitle: "Domande frequenti", talkToAgent: "Parla con un operatore" },
+      en: { chooseAgent: "Choose who to talk to", offline: "Offline", tooltip: "Chat with us!", faqTitle: "Frequently asked questions", talkToAgent: "Talk to an agent" },
+      es: { chooseAgent: "Elige con quién hablar", offline: "Desconectado", tooltip: "¡Chatea con nosotros!", faqTitle: "Preguntas frecuentes", talkToAgent: "Hablar con un agente" },
+      de: { chooseAgent: "Wähle deinen Ansprechpartner", offline: "Offline", tooltip: "Chatte mit uns!", faqTitle: "Häufig gestellte Fragen", talkToAgent: "Mit einem Agenten sprechen" },
+      fr: { chooseAgent: "Choisissez votre interlocuteur", offline: "Hors ligne", tooltip: "Discutez avec nous !", faqTitle: "Questions fréquentes", talkToAgent: "Parler à un agent" },
+      pt: { chooseAgent: "Escolha com quem falar", offline: "Offline", tooltip: "Fale conosco!", faqTitle: "Perguntas frequentes", talkToAgent: "Falar com um atendente" },
     };
     const lang = config.language || "it";
     const t = translations[lang] || translations["it"];
@@ -192,6 +256,9 @@
     const offlineBadge = document.getElementById("whatsapp-offline-badge");
     const agentPopup = document.getElementById("whatsapp-agent-popup");
     const agentList = document.getElementById("whatsapp-agent-list");
+    const faqPopup = document.getElementById("whatsapp-faq-popup");
+    const faqList = document.getElementById("whatsapp-faq-list");
+    const faqAgentBtn = document.getElementById("whatsapp-faq-agent-btn");
 
     // Position
     container.style.bottom = `${config.marginBottom || 20}px`;
@@ -253,18 +320,75 @@
     } else {
       // Multi-agent or single
       const agents = config.agents || [];
-      if (agents.length > 1) {
-        // Multi-agent mode: show popup on click
-        button.href = "#";
-        button.addEventListener("click", (e) => {
-          e.preventDefault();
+      const faqEnabled = config.faqEnabled;
+      const faqItems = config.faqItems || [];
+
+      // Logic to show agent popup directly or route to direct link
+      const showAgentFlow = () => {
+        if (agents.length > 1) {
           const isVisible = agentPopup.style.display !== "none";
           agentPopup.style.display = isVisible ? "none" : "block";
           if (!isVisible) {
             document.getElementById("whatsapp-popup-title").textContent = t.chooseAgent;
             agentPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
             agentPopup.style[sideKey] = `${config.marginSide || 20}px`;
+            faqPopup.style.display = "none";
           }
+        } else {
+          trackClick();
+          window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
+        }
+      };
+
+      if (faqEnabled && faqItems.length > 0) {
+        // FAQ Menu Mode
+        button.href = "#";
+        document.getElementById("whatsapp-faq-title").textContent = t.faqTitle;
+        faqAgentBtn.textContent = t.talkToAgent;
+        
+        faqPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
+        faqPopup.style[sideKey] = `${config.marginSide || 20}px`;
+
+        faqItems.forEach((faq) => {
+          const item = document.createElement("a");
+          item.className = "whatsapp-faq-item";
+          // If using single agent, use that number. If multi, try to use first agent or base number.
+          const targetPhone = agents.length > 0 ? agents[0].phone : config.phoneNumber;
+          item.href = buildWaUrl(targetPhone, faq.answer);
+          item.target = "_blank";
+          item.textContent = faq.question;
+          item.addEventListener("click", () => {
+            trackClick();
+            faqPopup.style.display = "none";
+          });
+          faqList.appendChild(item);
+        });
+
+        faqAgentBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          faqPopup.style.display = "none";
+          showAgentFlow();
+        });
+
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          const isVisible = faqPopup.style.display !== "none";
+          faqPopup.style.display = isVisible ? "none" : "block";
+          agentPopup.style.display = "none";
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!container.contains(e.target) && !faqPopup.contains(e.target)) {
+            faqPopup.style.display = "none";
+          }
+        });
+
+      } else if (agents.length > 1) {
+        // Multi-agent mode: show popup on click
+        button.href = "#";
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          showAgentFlow();
         });
 
         // Close popup when clicking outside

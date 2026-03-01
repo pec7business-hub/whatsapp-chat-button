@@ -71,8 +71,10 @@ export const action = async ({ request }) => {
         startTime: formData.get("startTime") || "09:00",
         endTime: formData.get("endTime") || "18:00",
         offlineMessage: formData.get("offlineMessage") || "",
-        // Agents
+        // Agents & FAQ
         agents,
+        faqEnabled: formData.get("faqEnabled") === "true",
+        faqItems: String(formData.get("faqItems") || "[]"),
     };
 
     await db.settings.update({ where: { shop }, data });
@@ -129,6 +131,11 @@ export default function Settings() {
         try { return JSON.parse(settings.availabilityDays || "[1,2,3,4,5]"); } catch { return [1, 2, 3, 4, 5]; }
     });
 
+    // Parse FAQ items
+    const [faqItems, setFaqItems] = useState(() => {
+        try { return JSON.parse(settings.faqItems || "[]"); } catch { return []; }
+    });
+
     // Day names from translations
     const DAYS = t.dayNames.map((label, value) => ({ label, value }));
 
@@ -165,11 +172,20 @@ export default function Settings() {
 
     const removeAgent = (idx) => setAgents((prev) => prev.filter((_, i) => i !== idx));
 
+    const addFaq = () =>
+        setFaqItems((prev) => [...prev, { question: "", answer: "" }]);
+
+    const updateFaq = (idx, field, value) =>
+        setFaqItems((prev) => prev.map((f, i) => (i === idx ? { ...f, [field]: value } : f)));
+
+    const removeFaq = (idx) => setFaqItems((prev) => prev.filter((_, i) => i !== idx));
+
     const handleSave = () => {
         const data = {
             ...formState,
             availabilityDays: JSON.stringify(availDays),
             agents: JSON.stringify(agents),
+            faqItems: JSON.stringify(faqItems),
         };
         submit(data, { method: "post" });
     };
@@ -435,6 +451,69 @@ export default function Settings() {
                                         ))}
                                         {agents.length < 5 && (
                                             <Button onClick={addAgent}>{t.agentAdd}</Button>
+                                        )}
+                                    </BlockStack>
+                                )}
+                            </BlockStack>
+                        </Card>
+
+                        {/* FAQ Menu */}
+                        <Card>
+                            <BlockStack gap="400">
+                                <InlineStack gap="200" align="space-between">
+                                    <Text as="h2" variant="headingMd">{t.faqTitle}</Text>
+                                    {!isPro && <Badge tone="warning">Pro</Badge>}
+                                </InlineStack>
+                                {!isPro ? (
+                                    <Banner tone="info">
+                                        {t.faqUpgrade}{" "}
+                                        <a href="/app/pricing">{t.seePlans}</a>
+                                    </Banner>
+                                ) : (
+                                    <BlockStack gap="400">
+                                        <Text tone="subdued">
+                                            {t.faqInfo}
+                                        </Text>
+                                        <Checkbox
+                                            label={t.faqEnable}
+                                            checked={formState.faqEnabled}
+                                            onChange={(val) => handleChange(val, "faqEnabled")}
+                                        />
+                                        {formState.faqEnabled && (
+                                            <BlockStack gap="400">
+                                                {faqItems.map((faq, idx) => (
+                                                    <Card key={idx}>
+                                                        <BlockStack gap="300">
+                                                            <InlineStack align="space-between">
+                                                                <Text variant="headingSm">{t.faqItem} {idx + 1}</Text>
+                                                                <Button tone="critical" size="slim" onClick={() => removeFaq(idx)}>
+                                                                    {t.faqRemove}
+                                                                </Button>
+                                                            </InlineStack>
+                                                            <BlockStack gap="300">
+                                                                <TextField
+                                                                    label={t.faqQuestion}
+                                                                    value={faq.question}
+                                                                    onChange={(v) => updateFaq(idx, "question", v)}
+                                                                    autoComplete="off"
+                                                                    placeholder={t.faqQuestionPlaceholder}
+                                                                />
+                                                                <TextField
+                                                                    label={t.faqAnswer}
+                                                                    value={faq.answer}
+                                                                    onChange={(v) => updateFaq(idx, "answer", v)}
+                                                                    autoComplete="off"
+                                                                    placeholder={t.faqAnswerPlaceholder}
+                                                                    multiline={2}
+                                                                />
+                                                            </BlockStack>
+                                                        </BlockStack>
+                                                    </Card>
+                                                ))}
+                                                {faqItems.length < 10 && (
+                                                    <Button onClick={addFaq}>{t.faqAdd}</Button>
+                                                )}
+                                            </BlockStack>
                                         )}
                                     </BlockStack>
                                 )}
