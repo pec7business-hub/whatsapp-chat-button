@@ -152,7 +152,6 @@ export default function Settings() {
             ...prev,
             language: newLang,
             defaultMessage: msgs.defaultMessage,
-            productMessageTemplate: msgs.productMessageTemplate,
             tooltipText: msgs.tooltipText,
             offlineMessage: msgs.offlineMessage,
         }));
@@ -231,16 +230,6 @@ export default function Settings() {
                                     value={formState.language || "en"}
                                     onChange={handleLanguageChange}
                                     helpText={t.languageHelp}
-                                />
-                                <Divider />
-                                <Text as="h3" variant="headingSm">{t.productMessageTitle}</Text>
-                                <TextField
-                                    label={t.productMessageLabel}
-                                    value={formState.productMessageTemplate || "Ciao! Sono interessato a: {{product}}"}
-                                    onChange={(val) => handleChange(val, "productMessageTemplate")}
-                                    helpText={t.productMessageHelp}
-                                    multiline={2}
-                                    autoComplete="off"
                                 />
                             </BlockStack>
                         </Card>

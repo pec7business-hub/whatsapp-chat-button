@@ -339,18 +339,7 @@
       button.classList.add("anim-bounce");
     }
 
-    // Smart message: use product message template if on product page
     let baseMessage = config.defaultMessage || "";
-    try {
-      const pageType = window.ShopifyAnalytics?.lib?.page?.()?.pageType;
-      if (pageType === "product") {
-        const productTitle = document.querySelector("h1")?.textContent?.trim();
-        if (productTitle) {
-          const template = config.productMessageTemplate || "Ciao! Sono interessato a: {{product}}";
-          baseMessage = template.replace("{{product}}", productTitle);
-        }
-      }
-    } catch {}
 
     const buildWaUrl = (phone, msg) => {
       const cleanPhone = (phone || "").replace(/[^0-9]/g, "");

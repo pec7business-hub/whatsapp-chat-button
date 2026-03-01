@@ -66,7 +66,6 @@ model Settings {
 
   // Lingua interfaccia
   language        String  @default("en")       // it, en, es, de, fr, pt
-  productMessageTemplate String @default("Hi! I'm interested in: {{product}}")
 
   // Multi-agente (JSON)
   agents          String  @default("[]")

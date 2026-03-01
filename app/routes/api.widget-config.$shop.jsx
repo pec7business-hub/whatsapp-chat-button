@@ -85,7 +85,6 @@ export async function loader({ params }) {
             faqItems,
             plan: settings.plan,
             language: settings.language || "en",
-            productMessageTemplate: settings.productMessageTemplate || "Hi! I'm interested in: {{product}}",
         }, { headers: CORS_HEADERS });
 
     } catch (error) {
