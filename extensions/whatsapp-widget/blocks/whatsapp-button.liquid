@@ -21,10 +21,26 @@
 
   <!-- FAQ popup (hidden by default) -->
   <div id="whatsapp-faq-popup" style="display:none;" role="dialog" aria-label="FAQ">
-    <div id="whatsapp-faq-title">Domande Frequenti</div>
-    <div id="whatsapp-faq-list"></div>
-    <div class="whatsapp-faq-footer">
-      <a href="#" id="whatsapp-faq-agent-btn">Oppure parla con un operatore</a>
+    <!-- View 1: Question list -->
+    <div id="whatsapp-faq-view-list">
+      <div id="whatsapp-faq-title">Domande Frequenti</div>
+      <div id="whatsapp-faq-list"></div>
+      <div class="whatsapp-faq-footer">
+        <a href="#" id="whatsapp-faq-agent-btn">Oppure parla con un operatore</a>
+      </div>
+    </div>
+    <!-- View 2: Answer detail -->
+    <div id="whatsapp-faq-view-answer" style="display:none;">
+      <div id="whatsapp-faq-answer-header">
+        <button id="whatsapp-faq-back-btn" aria-label="Indietro">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span id="whatsapp-faq-answer-q"></span>
+      </div>
+      <div id="whatsapp-faq-answer-body"></div>
+      <div class="whatsapp-faq-footer">
+        <a href="#" id="whatsapp-faq-agent-btn2">Hai ancora domande? Parla con un operatore</a>
+      </div>
     </div>
   </div>
 </div>
@@ -161,20 +177,17 @@
   .whatsapp-agent-role { font-size: 11px; color: #888; }
   
   #whatsapp-faq-popup {
-    display: none;
-    position: absolute;
-    width: 280px;
+    position: fixed;
+    width: 300px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.16);
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     transform-origin: bottom right;
-    animation: agent-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
   
   #whatsapp-faq-title {
-    background: #075e54;
     color: #fff;
     font-weight: 600;
     padding: 14px 16px;
@@ -183,36 +196,75 @@
   }
   
   #whatsapp-faq-list {
-    max-height: 300px;
+    max-height: 260px;
     overflow-y: auto;
   }
   
   .whatsapp-faq-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
-    text-decoration: none;
     color: #111;
     font-size: 13px;
-    transition: background 0.2s;
     cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .whatsapp-faq-item:hover { background: #f5f5f5; }
+  .whatsapp-faq-item:last-child { border-bottom: none; }
+  .whatsapp-faq-item svg { flex-shrink: 0; margin-left: 8px; opacity: 0.4; }
+  
+  #whatsapp-faq-answer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
   }
   
-  .whatsapp-faq-item:hover { background: #f9f9f9; }
-  .whatsapp-faq-item:last-child { border-bottom: none; }
+  #whatsapp-faq-back-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  #whatsapp-faq-back-btn:hover { background: rgba(255,255,255,0.35); }
   
+  #whatsapp-faq-answer-body {
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #333;
+    min-height: 60px;
+  }
+
   .whatsapp-faq-footer {
-    padding: 10px;
+    padding: 10px 16px;
     text-align: center;
     background: #f7f7f7;
     border-top: 1px solid #eaeaea;
   }
   
-  #whatsapp-faq-agent-btn {
-    color: #075e54;
+  #whatsapp-faq-agent-btn,
+  #whatsapp-faq-agent-btn2 {
     font-size: 12px;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
 </style>
 
@@ -341,65 +393,98 @@
       };
 
       if (faqEnabled && faqItems.length > 0) {
-        // FAQ Menu Mode
+        // ── FAQ Menu Mode ──────────────────────────────────────────────
         button.href = "#";
+        const btnColor = config.buttonColor || "#25D366";
 
-        // Apply button color to FAQ popup header
+        // Grab two-view elements
+        const viewList   = document.getElementById("whatsapp-faq-view-list");
+        const viewAnswer = document.getElementById("whatsapp-faq-view-answer");
+        const answerQ    = document.getElementById("whatsapp-faq-answer-q");
+        const answerBody = document.getElementById("whatsapp-faq-answer-body");
+        const backBtn    = document.getElementById("whatsapp-faq-back-btn");
+        const faqAgentBtn2 = document.getElementById("whatsapp-faq-agent-btn2");
+
+        // Apply button color to popup headers and links
         const faqTitleEl = document.getElementById("whatsapp-faq-title");
         faqTitleEl.textContent = t.faqTitle;
-        faqTitleEl.style.backgroundColor = config.buttonColor || "#25D366";
-        faqAgentBtn.style.color = config.buttonColor || "#25D366";
+        faqTitleEl.style.backgroundColor = btnColor;
+        const answerHeader = document.getElementById("whatsapp-faq-answer-header");
+        if (answerHeader) answerHeader.style.backgroundColor = btnColor;
+        faqAgentBtn.style.color = btnColor;
         faqAgentBtn.textContent = t.talkToAgent;
+        if (faqAgentBtn2) { faqAgentBtn2.style.color = btnColor; faqAgentBtn2.textContent = t.talkToAgent; }
 
+        // Position popup
         faqPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
         faqPopup.style[sideKey] = `${config.marginSide || 20}px`;
-        faqPopup.style.position = "fixed";
 
+        // Helper to open WhatsApp with default message
+        const openWhatsApp = () => {
+          trackClick();
+          window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
+        };
+
+        // Build question list - clicking shows answer in popup (does NOT open WA)
         faqItems.forEach((faq) => {
-          const item = document.createElement("a");
+          const item = document.createElement("div");
           item.className = "whatsapp-faq-item";
-          const targetPhone = config.phoneNumber;
-          const waUrl = buildWaUrl(targetPhone, faq.answer);
-          item.href = "#";
-          item.textContent = faq.question;
+          item.innerHTML = `<span>${faq.question}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
           item.addEventListener("click", (e) => {
-            e.preventDefault();
-            trackClick();
-            faqPopup.style.display = "none";
-            window.open(waUrl, "_blank");
+            e.stopPropagation();
+            answerQ.textContent = faq.question;
+            answerBody.textContent = faq.answer;
+            if (viewList) viewList.style.display = "none";
+            if (viewAnswer) viewAnswer.style.display = "block";
           });
           faqList.appendChild(item);
         });
 
+        // Back button → return to question list
+        if (backBtn) {
+          backBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (viewAnswer) viewAnswer.style.display = "none";
+            if (viewList) viewList.style.display = "block";
+          });
+        }
+
+        // "Talk to agent" buttons → open WhatsApp with base message
         faqAgentBtn.addEventListener("click", (e) => {
           e.preventDefault();
+          e.stopPropagation();
           faqPopup.style.display = "none";
-          if (agents.length > 1) {
-            showAgentFlow();
-          } else {
-            trackClick();
-            window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
-          }
+          openWhatsApp();
         });
+        if (faqAgentBtn2) {
+          faqAgentBtn2.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            faqPopup.style.display = "none";
+            openWhatsApp();
+          });
+        }
 
+        // Toggle popup on WhatsApp button click
         button.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
           const isVisible = faqPopup.style.display === "block";
-          faqPopup.style.display = isVisible ? "none" : "block";
+          if (isVisible) {
+            faqPopup.style.display = "none";
+          } else {
+            if (viewList) viewList.style.display = "block";
+            if (viewAnswer) viewAnswer.style.display = "none";
+            faqPopup.style.display = "block";
+          }
           agentPopup.style.display = "none";
         });
 
-        // Stop click inside popup from closing it
-        faqPopup.addEventListener("click", (e) => {
-          e.stopPropagation();
-        });
+        // Clicks inside popup do NOT propagate to document (prevents auto-close)
+        faqPopup.addEventListener("click", (e) => e.stopPropagation());
 
-        document.addEventListener("click", (e) => {
-          if (!container.contains(e.target)) {
-            faqPopup.style.display = "none";
-          }
-        });
+        // Click outside popup → close it
+        document.addEventListener("click", () => { faqPopup.style.display = "none"; });
 
       } else if (agents.length > 1) {
         // Multi-agent mode: show popup on click
