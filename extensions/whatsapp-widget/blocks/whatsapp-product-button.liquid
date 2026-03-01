@@ -1,9 +1,7 @@
 {% schema %}
 {
   "name": "WhatsApp In-Page",
-  "type": "whatsapp_inpage",
-  "templates": ["product"],
-  "limit": 1,
+  "target": "section",
   "settings": []
 }
 {% endschema %}
@@ -76,7 +74,7 @@
     const targetPhone = config.phoneNumber || "";
     
     // Add product name and URL to default message
-    const productName = "{{ product.title | escape | replace: '"', '\"' }}";
+    const productName = "{{ product.title | escape | replace: '\"', '\\\"' }}";
     const productUrl = window.location.href;
     let baseMessage = config.defaultMessage || "";
     if (baseMessage) baseMessage += "\n\n";
