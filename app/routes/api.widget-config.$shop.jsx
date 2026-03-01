@@ -79,6 +79,8 @@ export async function loader({ params }) {
             animation: settings.animation,
             agents,
             plan: settings.plan,
+            language: settings.language || "it",
+            productMessageTemplate: settings.productMessageTemplate || "Ciao! Sono interessato a: {{product}}",
         }, { headers: CORS_HEADERS });
 
     } catch (error) {

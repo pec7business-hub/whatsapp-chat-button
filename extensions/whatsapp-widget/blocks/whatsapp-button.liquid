@@ -15,7 +15,7 @@
 
   <!-- Multi-agent popup (hidden by default) -->
   <div id="whatsapp-agent-popup" style="display:none;" role="dialog" aria-label="Scegli un agente">
-    <p id="whatsapp-popup-title">Scegli con chi parlare</p>
+    <p id="whatsapp-popup-title"></p>
     <div id="whatsapp-agent-list"></div>
   </div>
 </div>
@@ -170,6 +170,18 @@
 
     if (!config.isEnabled) return;
 
+    // Language translations
+    const translations = {
+      it: { chooseAgent: "Scegli con chi parlare", offline: "Offline", tooltip: "Chatta con noi!" },
+      en: { chooseAgent: "Choose who to talk to", offline: "Offline", tooltip: "Chat with us!" },
+      es: { chooseAgent: "Elige con quién hablar", offline: "Desconectado", tooltip: "¡Chatea con nosotros!" },
+      de: { chooseAgent: "Wähle deinen Ansprechpartner", offline: "Offline", tooltip: "Chatte mit uns!" },
+      fr: { chooseAgent: "Choisissez votre interlocuteur", offline: "Hors ligne", tooltip: "Discutez avec nous !" },
+      pt: { chooseAgent: "Escolha com quem falar", offline: "Offline", tooltip: "Fale conosco!" },
+    };
+    const lang = config.language || "it";
+    const t = translations[lang] || translations["it"];
+
     const isMobile = window.innerWidth <= 768;
     if (isMobile && !config.showOnMobile) return;
     if (!isMobile && !config.showOnDesktop) return;
@@ -195,9 +207,9 @@
     // Color
     button.style.backgroundColor = config.buttonColor || "#25D366";
 
-    // Tooltip
+    // Tooltip (use translated fallback)
     if (!config.tooltipEnabled && tooltip) tooltip.style.display = "none";
-    else if (tooltip) tooltip.textContent = config.tooltipText;
+    else if (tooltip) tooltip.textContent = config.tooltipText || t.tooltip;
 
     // Animation
     if (config.animation === "pulse") {
@@ -208,13 +220,16 @@
       button.classList.add("anim-bounce");
     }
 
-    // Smart message: include product name if on product page
+    // Smart message: use product message template if on product page
     let baseMessage = config.defaultMessage || "";
     try {
       const pageType = window.ShopifyAnalytics?.lib?.page?.()?.pageType;
       if (pageType === "product") {
         const productTitle = document.querySelector("h1")?.textContent?.trim();
-        if (productTitle) baseMessage = `${baseMessage}\n\n🛍️ Prodotto: ${productTitle}`;
+        if (productTitle) {
+          const template = config.productMessageTemplate || "Ciao! Sono interessato a: {{product}}";
+          baseMessage = template.replace("{{product}}", productTitle);
+        }
       }
     } catch {}
 
@@ -228,7 +243,7 @@
       button.style.filter = "grayscale(100%)";
       button.style.opacity = "0.7";
       if (offlineBadge) {
-        offlineBadge.textContent = config.offlineMessage || "Offline";
+        offlineBadge.textContent = config.offlineMessage || t.offline;
         offlineBadge.style.bottom = `${(config.marginBottom || 20) + sizePx + 8}px`;
         offlineBadge.style[sideKey] = `${config.marginSide || 20}px`;
         offlineBadge.style.display = "block";
@@ -246,6 +261,7 @@
           const isVisible = agentPopup.style.display !== "none";
           agentPopup.style.display = isVisible ? "none" : "block";
           if (!isVisible) {
+            document.getElementById("whatsapp-popup-title").textContent = t.chooseAgent;
             agentPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
             agentPopup.style[sideKey] = `${config.marginSide || 20}px`;
           }

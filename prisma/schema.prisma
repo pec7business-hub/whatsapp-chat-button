@@ -64,6 +64,10 @@ model Settings {
   endTime             String  @default("18:00")
   offlineMessage      String  @default("Siamo offline. Lasciaci un messaggio!")
 
+  // Lingua interfaccia
+  language        String  @default("it")       // it, en, es, de, fr, pt
+  productMessageTemplate String @default("Ciao! Sono interessato a: {{product}}")
+
   // Multi-agente (JSON)
   agents          String  @default("[]")
 

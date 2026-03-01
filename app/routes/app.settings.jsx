@@ -60,6 +60,9 @@ export const action = async ({ request }) => {
         marginSide: parseInt(formData.get("marginSide") || "20", 10),
         animation: formData.get("animation") || "pulse",
         isEnabled: formData.get("isEnabled") === "true",
+        // Language & Product Message
+        language: formData.get("language") || "it",
+        productMessageTemplate: formData.get("productMessageTemplate") || "Ciao! Sono interessato a: {{product}}",
         // Availability
         availabilityEnabled: formData.get("availabilityEnabled") === "true",
         timezone: formData.get("timezone") || "Europe/Rome",
@@ -92,6 +95,15 @@ const DAYS = [
     { label: "Gio", value: 4 },
     { label: "Ven", value: 5 },
     { label: "Sab", value: 6 },
+];
+
+const LANGUAGES = [
+    { label: "🇮🇹 Italiano", value: "it" },
+    { label: "🇬🇧 English", value: "en" },
+    { label: "🇪🇸 Español", value: "es" },
+    { label: "🇩🇪 Deutsch", value: "de" },
+    { label: "🇫🇷 Français", value: "fr" },
+    { label: "🇵🇹 Português", value: "pt" },
 ];
 
 export default function Settings() {
@@ -181,6 +193,24 @@ export default function Settings() {
                                     onChange={(val) => handleChange(val, "defaultMessage")}
                                     helpText="Messaggio precompilato quando il cliente apre la chat. Se è su una pagina prodotto, verrà aggiunto automaticamente il nome del prodotto."
                                     multiline={3}
+                                    autoComplete="off"
+                                />
+                                <Divider />
+                                <Select
+                                    label="Lingua dell'app"
+                                    options={LANGUAGES}
+                                    value={formState.language || "it"}
+                                    onChange={(val) => handleChange(val, "language")}
+                                    helpText="La lingua usata per i testi automatici del widget (tooltip, messaggi offline, ecc.)"
+                                />
+                                <Divider />
+                                <Text as="h3" variant="headingSm">Messaggio Prodotto Personalizzato</Text>
+                                <TextField
+                                    label="Template messaggio prodotto"
+                                    value={formState.productMessageTemplate || "Ciao! Sono interessato a: {{product}}"}
+                                    onChange={(val) => handleChange(val, "productMessageTemplate")}
+                                    helpText='Usa {{product}} come segnaposto per il nome del prodotto. Es: "Vorrei info su: {{product}}"'
+                                    multiline={2}
                                     autoComplete="off"
                                 />
                             </BlockStack>
