@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model Settings {
+  id              String   @id @default(uuid())
+  shop            String   @unique
+  phoneNumber     String   @default("")
+  defaultMessage  String   @default("Ciao! Ho una domanda riguardo...")
+  buttonPosition  String   @default("bottom-right")
+  buttonSize      String   @default("medium")
+  buttonColor     String   @default("#25D366")
+  tooltipText     String   @default("Chatta con noi!")
+  tooltipEnabled  Boolean  @default(true)
+  showOnMobile    Boolean  @default(true)
+  showOnDesktop   Boolean  @default(true)
+  marginBottom    Int      @default(20)
+  marginSide      Int      @default(20)
+  animation       String   @default("pulse")
+  isEnabled       Boolean  @default(true)
+  clickCount      Int      @default(0)
+
+  // Billing
+  plan            String   @default("free")         // free, pro
+  trialEndsAt     DateTime?
+  subscriptionId  String?
+
+  // Orari di disponibilità
+  availabilityEnabled Boolean @default(false)
+  timezone            String  @default("Europe/Rome")
+  availabilityDays    String  @default("[1,2,3,4,5]") // JSON array: 0=Dom, 6=Sab
+  startTime           String  @default("09:00")
+  endTime             String  @default("18:00")
+  offlineMessage      String  @default("Siamo offline. Lasciaci un messaggio!")
+
+  // Multi-agente (JSON)
+  agents          String  @default("[]")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ClickEvent {
+  id         String   @id @default(uuid())
+  shop       String
+  deviceType String   @default("unknown") // mobile, desktop
+  page       String   @default("/")
+  createdAt  DateTime @default(now())
+
+  @@index([shop, createdAt])
+}
