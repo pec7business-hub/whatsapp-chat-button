@@ -567,8 +567,48 @@ const translations = {
     },
 };
 
+// Default message content per language (auto-filled when user changes language)
+export const defaultMessages = {
+    en: {
+        defaultMessage: "Hi! I have a question about...",
+        productMessageTemplate: "Hi! I'm interested in: {{product}}",
+        tooltipText: "Chat with us!",
+        offlineMessage: "We're offline. Leave us a message!",
+    },
+    it: {
+        defaultMessage: "Ciao! Ho una domanda riguardo...",
+        productMessageTemplate: "Ciao! Sono interessato a: {{product}}",
+        tooltipText: "Chatta con noi!",
+        offlineMessage: "Siamo offline. Lasciaci un messaggio!",
+    },
+    es: {
+        defaultMessage: "¡Hola! Tengo una pregunta sobre...",
+        productMessageTemplate: "¡Hola! Estoy interesado en: {{product}}",
+        tooltipText: "¡Chatea con nosotros!",
+        offlineMessage: "Estamos desconectados. ¡Déjanos un mensaje!",
+    },
+    de: {
+        defaultMessage: "Hallo! Ich habe eine Frage zu...",
+        productMessageTemplate: "Hallo! Ich interessiere mich für: {{product}}",
+        tooltipText: "Chatte mit uns!",
+        offlineMessage: "Wir sind offline. Hinterlassen Sie uns eine Nachricht!",
+    },
+    fr: {
+        defaultMessage: "Bonjour ! J'ai une question à propos de...",
+        productMessageTemplate: "Bonjour ! Je suis intéressé par : {{product}}",
+        tooltipText: "Discutez avec nous !",
+        offlineMessage: "Nous sommes hors ligne. Laissez-nous un message !",
+    },
+    pt: {
+        defaultMessage: "Olá! Tenho uma pergunta sobre...",
+        productMessageTemplate: "Olá! Estou interessado em: {{product}}",
+        tooltipText: "Fale conosco!",
+        offlineMessage: "Estamos offline. Deixe-nos uma mensagem!",
+    },
+};
+
 export function getTranslations(lang) {
-    return translations[lang] || translations["it"];
+    return translations[lang] || translations["en"];
 }
 
 export default translations;

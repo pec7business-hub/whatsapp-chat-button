@@ -20,7 +20,7 @@ import {
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
-import { getTranslations } from "../translations";
+import { getTranslations, defaultMessages } from "../translations";
 
 export const loader = async ({ request }) => {
     const { session } = await authenticate.admin(request);
@@ -138,6 +138,19 @@ export default function Settings() {
 
     const handleChange = (value, id) => setFormState((prev) => ({ ...prev, [id]: value }));
 
+    // When language changes, auto-translate message fields
+    const handleLanguageChange = (newLang) => {
+        const msgs = defaultMessages[newLang] || defaultMessages["en"];
+        setFormState((prev) => ({
+            ...prev,
+            language: newLang,
+            defaultMessage: msgs.defaultMessage,
+            productMessageTemplate: msgs.productMessageTemplate,
+            tooltipText: msgs.tooltipText,
+            offlineMessage: msgs.offlineMessage,
+        }));
+    };
+
     const toggleDay = (day) => {
         setAvailDays((prev) =>
             prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
@@ -199,8 +212,8 @@ export default function Settings() {
                                 <Select
                                     label={t.language}
                                     options={LANGUAGES}
-                                    value={formState.language || "it"}
-                                    onChange={(val) => handleChange(val, "language")}
+                                    value={formState.language || "en"}
+                                    onChange={handleLanguageChange}
                                     helpText={t.languageHelp}
                                 />
                                 <Divider />

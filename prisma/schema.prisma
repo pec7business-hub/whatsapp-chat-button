@@ -37,11 +37,11 @@ model Settings {
   id              String   @id @default(uuid())
   shop            String   @unique
   phoneNumber     String   @default("")
-  defaultMessage  String   @default("Ciao! Ho una domanda riguardo...")
+  defaultMessage  String   @default("Hi! I have a question about...")
   buttonPosition  String   @default("bottom-right")
   buttonSize      String   @default("medium")
   buttonColor     String   @default("#25D366")
-  tooltipText     String   @default("Chatta con noi!")
+  tooltipText     String   @default("Chat with us!")
   tooltipEnabled  Boolean  @default(true)
   showOnMobile    Boolean  @default(true)
   showOnDesktop   Boolean  @default(true)
@@ -62,11 +62,11 @@ model Settings {
   availabilityDays    String  @default("[1,2,3,4,5]") // JSON array: 0=Dom, 6=Sab
   startTime           String  @default("09:00")
   endTime             String  @default("18:00")
-  offlineMessage      String  @default("Siamo offline. Lasciaci un messaggio!")
+  offlineMessage      String  @default("We're offline. Leave us a message!")
 
   // Lingua interfaccia
-  language        String  @default("it")       // it, en, es, de, fr, pt
-  productMessageTemplate String @default("Ciao! Sono interessato a: {{product}}")
+  language        String  @default("en")       // it, en, es, de, fr, pt
+  productMessageTemplate String @default("Hi! I'm interested in: {{product}}")
 
   // Multi-agente (JSON)
   agents          String  @default("[]")
