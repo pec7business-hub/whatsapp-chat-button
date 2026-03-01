@@ -157,8 +157,7 @@
     const shop = window.Shopify && window.Shopify.shop;
     if (!shop) return;
 
-    const apiUrl = "{{ block.settings.api_url }}";
-    if (!apiUrl || apiUrl === "https://your-app-url.com") return;
+    const apiUrl = "https://whatsapp-chat-button-production-1271.up.railway.app";
 
     let config;
     try {
@@ -317,13 +316,6 @@
   "name": "WhatsApp Button",
   "target": "body",
   "settings": [
-    {
-      "type": "text",
-      "id": "api_url",
-      "label": "App Backend URL",
-      "info": "URL dove gira il tuo backend (es. https://your-app-url.com). Richiesto fino alla pubblicazione dell'app.",
-      "default": "https://your-app-url.com"
-    },
     {
       "type": "checkbox",
       "id": "tooltip_enabled",
