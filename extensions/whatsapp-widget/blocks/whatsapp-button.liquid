@@ -419,10 +419,19 @@
         faqPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
         faqPopup.style[sideKey] = `${config.marginSide || 20}px`;
 
-        // Helper to open WhatsApp with default message
+        // Helper: open WhatsApp or show agent selector if multiple agents are set
         const openWhatsApp = () => {
-          trackClick();
-          window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
+          faqPopup.style.display = "none";
+          if (agents.length > 1) {
+            // Show agent selection popup
+            agentPopup.style.display = "block";
+            document.getElementById("whatsapp-popup-title").textContent = t.chooseAgent;
+            agentPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
+            agentPopup.style[sideKey] = `${config.marginSide || 20}px`;
+          } else {
+            trackClick();
+            window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
+          }
         };
 
         // Build question list - clicking shows answer in popup (does NOT open WA)
