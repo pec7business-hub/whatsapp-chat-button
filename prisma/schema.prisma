@@ -74,6 +74,10 @@ model Settings {
   faqEnabled      Boolean @default(false)
   faqItems        String  @default("[]")
 
+  // Pulsante In-Page Pagina Prodotto
+  productButtonEnabled Boolean @default(false)
+  productButtonLabel   String  @default("Chiedi su WhatsApp")
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

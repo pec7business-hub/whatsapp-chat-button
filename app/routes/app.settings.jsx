@@ -71,6 +71,9 @@ export const action = async ({ request }) => {
         startTime: formData.get("startTime") || "09:00",
         endTime: formData.get("endTime") || "18:00",
         offlineMessage: formData.get("offlineMessage") || "",
+        // Product Button
+        productButtonEnabled: formData.get("productButtonEnabled") === "true",
+        productButtonLabel: formData.get("productButtonLabel") || "Chiedi su WhatsApp",
         // Agents & FAQ
         agents,
         faqEnabled: formData.get("faqEnabled") === "true",
@@ -231,6 +234,41 @@ export default function Settings() {
                                     onChange={handleLanguageChange}
                                     helpText={t.languageHelp}
                                 />
+                            </BlockStack>
+                        </Card>
+
+                        {/* Product Button */}
+                        <Card>
+                            <BlockStack gap="400">
+                                <InlineStack gap="200" align="space-between">
+                                    <Text as="h2" variant="headingMd">{t.productButtonTitle}</Text>
+                                    {!isPro && <Badge tone="warning">Pro</Badge>}
+                                </InlineStack>
+                                {!isPro ? (
+                                    <Banner tone="info">
+                                        {t.productButtonUpgrade}{" "}
+                                        <a href="/app/pricing">{t.seePlans}</a>
+                                    </Banner>
+                                ) : (
+                                    <BlockStack gap="400">
+                                        <Banner tone="info">
+                                            {t.productButtonHelp}
+                                        </Banner>
+                                        <Checkbox
+                                            label={t.productButtonEnable}
+                                            checked={formState.productButtonEnabled}
+                                            onChange={(val) => handleChange(val, "productButtonEnabled")}
+                                        />
+                                        {formState.productButtonEnabled && (
+                                            <TextField
+                                                label={t.productButtonLabelLabel}
+                                                value={formState.productButtonLabel || "Chiedi su WhatsApp"}
+                                                onChange={(val) => handleChange(val, "productButtonLabel")}
+                                                autoComplete="off"
+                                            />
+                                        )}
+                                    </BlockStack>
+                                )}
                             </BlockStack>
                         </Card>
 

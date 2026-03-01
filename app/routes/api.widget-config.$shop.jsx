@@ -85,6 +85,8 @@ export async function loader({ params }) {
             faqItems,
             plan: settings.plan,
             language: settings.language || "en",
+            productButtonEnabled: settings.productButtonEnabled && settings.plan === "pro",
+            productButtonLabel: settings.productButtonLabel || "Chiedi su WhatsApp",
         }, { headers: CORS_HEADERS });
 
     } catch (error) {
