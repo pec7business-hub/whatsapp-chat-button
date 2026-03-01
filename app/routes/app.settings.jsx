@@ -63,7 +63,6 @@ export const action = async ({ request }) => {
         isEnabled: formData.get("isEnabled") === "true",
         // Language & Product Message
         language: formData.get("language") || "it",
-        productMessageTemplate: formData.get("productMessageTemplate") || "Ciao! Sono interessato a: {{product}}",
         // Availability
         availabilityEnabled: formData.get("availabilityEnabled") === "true",
         timezone: formData.get("timezone") || "Europe/Rome",
