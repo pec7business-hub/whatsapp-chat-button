@@ -391,6 +391,35 @@
           window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
         }
       };
+      // Always build agent cards if multi-agent, regardless of FAQ mode
+      if (agents.length > 1) {
+        document.getElementById("whatsapp-popup-title").textContent = t.chooseAgent;
+        agents.forEach((agent) => {
+          const card = document.createElement("a");
+          card.className = "whatsapp-agent-card";
+          card.href = buildWaUrl(agent.phone, baseMessage);
+          card.target = "_blank";
+          card.rel = "noopener noreferrer";
+          card.addEventListener("click", () => {
+            trackClick();
+            agentPopup.style.display = "none";
+          });
+          const avatarEl = document.createElement("div");
+          avatarEl.className = "whatsapp-agent-avatar";
+          if (agent.avatar) {
+            avatarEl.innerHTML = `<img src="${agent.avatar}" alt="${agent.name}" loading="lazy">`;
+          } else {
+            avatarEl.textContent = (agent.name || "A").charAt(0).toUpperCase();
+          }
+          const info = document.createElement("div");
+          info.className = "whatsapp-agent-info";
+          info.innerHTML = `<div class="whatsapp-agent-name">${agent.name || "Agente"}</div><div class="whatsapp-agent-role">${agent.role || ""}</div>`;
+          card.appendChild(avatarEl);
+          card.appendChild(info);
+          agentList.appendChild(card);
+        });
+        agentPopup.style.display = "none";
+      }
 
       if (faqEnabled && faqItems.length > 0) {
         // ── FAQ Menu Mode ──────────────────────────────────────────────
@@ -496,50 +525,19 @@
         document.addEventListener("click", () => { faqPopup.style.display = "none"; });
 
       } else if (agents.length > 1) {
-        // Multi-agent mode: show popup on click
+        // Multi-agent mode: show popup on button click
         button.href = "#";
         button.addEventListener("click", (e) => {
           e.preventDefault();
           showAgentFlow();
         });
 
-        // Close popup when clicking outside
+        // Close agent popup when clicking outside
         document.addEventListener("click", (e) => {
           if (!container.contains(e.target) && !agentPopup.contains(e.target)) {
             agentPopup.style.display = "none";
           }
         });
-
-        // Populate agent cards
-        agents.forEach((agent) => {
-          const card = document.createElement("a");
-          card.className = "whatsapp-agent-card";
-          card.href = buildWaUrl(agent.phone, baseMessage);
-          card.target = "_blank";
-          card.rel = "noopener noreferrer";
-          card.addEventListener("click", () => {
-            trackClick();
-            agentPopup.style.display = "none";
-          });
-
-          const avatarEl = document.createElement("div");
-          avatarEl.className = "whatsapp-agent-avatar";
-          if (agent.avatar) {
-            avatarEl.innerHTML = `<img src="${agent.avatar}" alt="${agent.name}" loading="lazy">`;
-          } else {
-            avatarEl.textContent = (agent.name || "A").charAt(0).toUpperCase();
-          }
-
-          const info = document.createElement("div");
-          info.className = "whatsapp-agent-info";
-          info.innerHTML = `<div class="whatsapp-agent-name">${agent.name || "Agente"}</div><div class="whatsapp-agent-role">${agent.role || ""}</div>`;
-
-          card.appendChild(avatarEl);
-          card.appendChild(info);
-          agentList.appendChild(card);
-        });
-
-        agentPopup.style.display = "none";
       } else {
         // Single agent
         button.href = buildWaUrl(config.phoneNumber, baseMessage);
