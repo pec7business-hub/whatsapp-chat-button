@@ -343,23 +343,30 @@
       if (faqEnabled && faqItems.length > 0) {
         // FAQ Menu Mode
         button.href = "#";
-        document.getElementById("whatsapp-faq-title").textContent = t.faqTitle;
+
+        // Apply button color to FAQ popup header
+        const faqTitleEl = document.getElementById("whatsapp-faq-title");
+        faqTitleEl.textContent = t.faqTitle;
+        faqTitleEl.style.backgroundColor = config.buttonColor || "#25D366";
+        faqAgentBtn.style.color = config.buttonColor || "#25D366";
         faqAgentBtn.textContent = t.talkToAgent;
-        
+
         faqPopup.style.bottom = `${(config.marginBottom || 20) + sizePx + 12}px`;
         faqPopup.style[sideKey] = `${config.marginSide || 20}px`;
+        faqPopup.style.position = "fixed";
 
         faqItems.forEach((faq) => {
           const item = document.createElement("a");
           item.className = "whatsapp-faq-item";
-          // If using single agent, use that number. If multi, try to use first agent or base number.
-          const targetPhone = agents.length > 0 ? agents[0].phone : config.phoneNumber;
-          item.href = buildWaUrl(targetPhone, faq.answer);
-          item.target = "_blank";
+          const targetPhone = config.phoneNumber;
+          const waUrl = buildWaUrl(targetPhone, faq.answer);
+          item.href = "#";
           item.textContent = faq.question;
-          item.addEventListener("click", () => {
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
             trackClick();
             faqPopup.style.display = "none";
+            window.open(waUrl, "_blank");
           });
           faqList.appendChild(item);
         });
@@ -367,12 +374,17 @@
         faqAgentBtn.addEventListener("click", (e) => {
           e.preventDefault();
           faqPopup.style.display = "none";
-          showAgentFlow();
+          if (agents.length > 1) {
+            showAgentFlow();
+          } else {
+            trackClick();
+            window.open(buildWaUrl(config.phoneNumber, baseMessage), "_blank");
+          }
         });
 
         button.addEventListener("click", (e) => {
           e.preventDefault();
-          const isVisible = faqPopup.style.display !== "none";
+          const isVisible = faqPopup.style.display === "block";
           faqPopup.style.display = isVisible ? "none" : "block";
           agentPopup.style.display = "none";
         });
