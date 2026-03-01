@@ -20,6 +20,7 @@ import {
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
+import { getTranslations } from "../translations";
 
 export const loader = async ({ request }) => {
     const { session } = await authenticate.admin(request);
@@ -75,7 +76,10 @@ export const action = async ({ request }) => {
     };
 
     await db.settings.update({ where: { shop }, data });
-    return json({ success: true, message: "Impostazioni salvate!" });
+
+    // Return the saved language so we can show the correct toast
+    const t = getTranslations(data.language);
+    return json({ success: true, message: t.settings.saved });
 };
 
 const TIMEZONES = [
@@ -85,16 +89,6 @@ const TIMEZONES = [
     { label: "Los Angeles - America/Los_Angeles", value: "America/Los_Angeles" },
     { label: "Dubai - Asia/Dubai", value: "Asia/Dubai" },
     { label: "Sydney - Australia/Sydney", value: "Australia/Sydney" },
-];
-
-const DAYS = [
-    { label: "Dom", value: 0 },
-    { label: "Lun", value: 1 },
-    { label: "Mar", value: 2 },
-    { label: "Mer", value: 3 },
-    { label: "Gio", value: 4 },
-    { label: "Ven", value: 5 },
-    { label: "Sab", value: 6 },
 ];
 
 const LANGUAGES = [
@@ -122,6 +116,9 @@ export default function Settings() {
         agents: settings.agents || "[]",
     });
 
+    // Get translations based on currently selected language
+    const t = getTranslations(formState.language || "it").settings;
+
     // Parse agents from JSON string
     const [agents, setAgents] = useState(() => {
         try { return JSON.parse(settings.agents || "[]"); } catch { return []; }
@@ -131,6 +128,9 @@ export default function Settings() {
     const [availDays, setAvailDays] = useState(() => {
         try { return JSON.parse(settings.availabilityDays || "[1,2,3,4,5]"); } catch { return [1, 2, 3, 4, 5]; }
     });
+
+    // Day names from translations
+    const DAYS = t.dayNames.map((label, value) => ({ label, value }));
 
     useEffect(() => {
         if (actionData?.success) shopify.toast.show(actionData.message);
@@ -164,52 +164,52 @@ export default function Settings() {
     return (
         <Page
             backAction={{ content: "Dashboard", url: "/app" }}
-            title="Impostazioni WhatsApp Button"
-            primaryAction={{ content: "Salva", onAction: handleSave, loading: isSaving }}
+            title={t.title}
+            primaryAction={{ content: t.save, onAction: handleSave, loading: isSaving }}
         >
-            <TitleBar title="Impostazioni" />
+            <TitleBar title={t.title} />
             <Layout>
                 <Layout.Section>
                     <BlockStack gap="500">
                         {/* General */}
                         <Card>
                             <BlockStack gap="400">
-                                <Text as="h2" variant="headingMd">Configurazione Generale</Text>
+                                <Text as="h2" variant="headingMd">{t.generalTitle}</Text>
                                 <Checkbox
-                                    label="Attiva il pulsante WhatsApp sul tuo negozio"
+                                    label={t.enableButton}
                                     checked={formState.isEnabled}
                                     onChange={(val) => handleChange(val, "isEnabled")}
                                 />
                                 <TextField
-                                    label="Numero WhatsApp"
+                                    label={t.phoneNumber}
                                     value={formState.phoneNumber}
                                     onChange={(val) => handleChange(val, "phoneNumber")}
-                                    helpText="Includi il prefisso internazionale, es. +39123456789"
+                                    helpText={t.phoneHelp}
                                     autoComplete="off"
                                 />
                                 <TextField
-                                    label="Messaggio Predefinito"
+                                    label={t.defaultMessage}
                                     value={formState.defaultMessage}
                                     onChange={(val) => handleChange(val, "defaultMessage")}
-                                    helpText="Messaggio precompilato quando il cliente apre la chat. Se è su una pagina prodotto, verrà aggiunto automaticamente il nome del prodotto."
+                                    helpText={t.defaultMessageHelp}
                                     multiline={3}
                                     autoComplete="off"
                                 />
                                 <Divider />
                                 <Select
-                                    label="Lingua dell'app"
+                                    label={t.language}
                                     options={LANGUAGES}
                                     value={formState.language || "it"}
                                     onChange={(val) => handleChange(val, "language")}
-                                    helpText="La lingua usata per i testi automatici del widget (tooltip, messaggi offline, ecc.)"
+                                    helpText={t.languageHelp}
                                 />
                                 <Divider />
-                                <Text as="h3" variant="headingSm">Messaggio Prodotto Personalizzato</Text>
+                                <Text as="h3" variant="headingSm">{t.productMessageTitle}</Text>
                                 <TextField
-                                    label="Template messaggio prodotto"
+                                    label={t.productMessageLabel}
                                     value={formState.productMessageTemplate || "Ciao! Sono interessato a: {{product}}"}
                                     onChange={(val) => handleChange(val, "productMessageTemplate")}
-                                    helpText='Usa {{product}} come segnaposto per il nome del prodotto. Es: "Vorrei info su: {{product}}"'
+                                    helpText={t.productMessageHelp}
                                     multiline={2}
                                     autoComplete="off"
                                 />
@@ -219,29 +219,29 @@ export default function Settings() {
                         {/* Appearance */}
                         <Card>
                             <BlockStack gap="400">
-                                <Text as="h2" variant="headingMd">Aspetto</Text>
+                                <Text as="h2" variant="headingMd">{t.appearanceTitle}</Text>
                                 <InlineGrid columns={2} gap="400">
                                     <Select
-                                        label="Posizione"
+                                        label={t.position}
                                         options={[
-                                            { label: "In basso a destra", value: "bottom-right" },
-                                            { label: "In basso a sinistra", value: "bottom-left" },
+                                            { label: t.positionRight, value: "bottom-right" },
+                                            { label: t.positionLeft, value: "bottom-left" },
                                         ]}
                                         value={formState.buttonPosition}
                                         onChange={(val) => handleChange(val, "buttonPosition")}
                                     />
                                     <Select
-                                        label="Dimensione"
+                                        label={t.size}
                                         options={[
-                                            { label: "Piccolo", value: "small" },
-                                            { label: "Medio", value: "medium" },
-                                            { label: "Grande", value: "large" },
+                                            { label: t.sizeSmall, value: "small" },
+                                            { label: t.sizeMedium, value: "medium" },
+                                            { label: t.sizeLarge, value: "large" },
                                         ]}
                                         value={formState.buttonSize}
                                         onChange={(val) => handleChange(val, "buttonSize")}
                                     />
                                     <TextField
-                                        label="Colore (Hex)"
+                                        label={t.color}
                                         value={formState.buttonColor}
                                         onChange={(val) => handleChange(val, "buttonColor")}
                                         autoComplete="off"
@@ -250,11 +250,11 @@ export default function Settings() {
                                         }
                                     />
                                     <Select
-                                        label="Animazione"
+                                        label={t.animationLabel}
                                         options={[
-                                            { label: "Nessuna", value: "none" },
-                                            { label: "Pulse", value: "pulse" },
-                                            { label: "Bounce", value: "bounce" },
+                                            { label: t.animNone, value: "none" },
+                                            { label: t.animPulse, value: "pulse" },
+                                            { label: t.animBounce, value: "bounce" },
                                         ]}
                                         value={formState.animation}
                                         onChange={(val) => handleChange(val, "animation")}
@@ -266,15 +266,15 @@ export default function Settings() {
                         {/* Tooltip & Visibility */}
                         <Card>
                             <BlockStack gap="400">
-                                <Text as="h2" variant="headingMd">Tooltip & Visibilità</Text>
+                                <Text as="h2" variant="headingMd">{t.tooltipTitle}</Text>
                                 <Checkbox
-                                    label="Mostra tooltip"
+                                    label={t.showTooltip}
                                     checked={formState.tooltipEnabled}
                                     onChange={(val) => handleChange(val, "tooltipEnabled")}
                                 />
                                 {formState.tooltipEnabled && (
                                     <TextField
-                                        label="Testo tooltip"
+                                        label={t.tooltipText}
                                         value={formState.tooltipText}
                                         onChange={(val) => handleChange(val, "tooltipText")}
                                         autoComplete="off"
@@ -282,12 +282,12 @@ export default function Settings() {
                                 )}
                                 <InlineGrid columns={2} gap="400">
                                     <Checkbox
-                                        label="Mostra su Mobile"
+                                        label={t.showMobile}
                                         checked={formState.showOnMobile}
                                         onChange={(val) => handleChange(val, "showOnMobile")}
                                     />
                                     <Checkbox
-                                        label="Mostra su Desktop"
+                                        label={t.showDesktop}
                                         checked={formState.showOnDesktop}
                                         onChange={(val) => handleChange(val, "showOnDesktop")}
                                     />
@@ -299,17 +299,17 @@ export default function Settings() {
                         <Card>
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
-                                    <Text as="h2" variant="headingMd">Orari di Disponibilità</Text>
+                                    <Text as="h2" variant="headingMd">{t.availabilityTitle}</Text>
                                     {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
                                 {!isPro && (
                                     <Banner tone="info">
-                                        Aggiorna al piano Pro per attivare gli orari di disponibilità.{" "}
-                                        <a href="/app/pricing">Vedi piani</a>
+                                        {t.availabilityUpgrade}{" "}
+                                        <a href="/app/pricing">{t.seePlans}</a>
                                     </Banner>
                                 )}
                                 <Checkbox
-                                    label="Attiva orari di disponibilità"
+                                    label={t.availabilityEnable}
                                     checked={formState.availabilityEnabled}
                                     onChange={(val) => handleChange(val, "availabilityEnabled")}
                                     disabled={!isPro}
@@ -317,12 +317,12 @@ export default function Settings() {
                                 {formState.availabilityEnabled && isPro && (
                                     <BlockStack gap="400">
                                         <Select
-                                            label="Fuso Orario"
+                                            label={t.timezone}
                                             options={TIMEZONES}
                                             value={formState.timezone}
                                             onChange={(val) => handleChange(val, "timezone")}
                                         />
-                                        <Text as="p" variant="bodyMd">Giorni di disponibilità</Text>
+                                        <Text as="p" variant="bodyMd">{t.availableDays}</Text>
                                         <InlineStack gap="200">
                                             {DAYS.map((d) => (
                                                 <Button
@@ -337,14 +337,14 @@ export default function Settings() {
                                         </InlineStack>
                                         <InlineGrid columns={2} gap="400">
                                             <TextField
-                                                label="Apertura"
+                                                label={t.openTime}
                                                 type="time"
                                                 value={formState.startTime}
                                                 onChange={(val) => handleChange(val, "startTime")}
                                                 autoComplete="off"
                                             />
                                             <TextField
-                                                label="Chiusura"
+                                                label={t.closeTime}
                                                 type="time"
                                                 value={formState.endTime}
                                                 onChange={(val) => handleChange(val, "endTime")}
@@ -352,10 +352,10 @@ export default function Settings() {
                                             />
                                         </InlineGrid>
                                         <TextField
-                                            label="Messaggio offline"
+                                            label={t.offlineMessage}
                                             value={formState.offlineMessage}
                                             onChange={(val) => handleChange(val, "offlineMessage")}
-                                            helpText="Mostrato ai clienti fuori orario"
+                                            helpText={t.offlineHelp}
                                             autoComplete="off"
                                         />
                                     </BlockStack>
@@ -367,51 +367,51 @@ export default function Settings() {
                         <Card>
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
-                                    <Text as="h2" variant="headingMd">Multi-Agente</Text>
+                                    <Text as="h2" variant="headingMd">{t.agentTitle}</Text>
                                     {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
                                 {!isPro ? (
                                     <Banner tone="info">
-                                        Aggiorna al piano Pro per aggiungere più agenti WhatsApp.{" "}
-                                        <a href="/app/pricing">Vedi piani</a>
+                                        {t.agentUpgrade}{" "}
+                                        <a href="/app/pricing">{t.seePlans}</a>
                                     </Banner>
                                 ) : (
                                     <BlockStack gap="400">
                                         <Text tone="subdued">
-                                            Aggiungi fino a 5 agenti. Il visitatore sceglierà a chi scrivere.
+                                            {t.agentInfo}
                                         </Text>
                                         {agents.map((agent, idx) => (
                                             <Card key={idx}>
                                                 <BlockStack gap="300">
                                                     <InlineStack align="space-between">
-                                                        <Text variant="headingSm">Agente {idx + 1}</Text>
+                                                        <Text variant="headingSm">{t.agentLabel} {idx + 1}</Text>
                                                         <Button tone="critical" size="slim" onClick={() => removeAgent(idx)}>
-                                                            Rimuovi
+                                                            {t.agentRemove}
                                                         </Button>
                                                     </InlineStack>
                                                     <InlineGrid columns={2} gap="300">
                                                         <TextField
-                                                            label="Nome"
+                                                            label={t.agentName}
                                                             value={agent.name}
                                                             onChange={(v) => updateAgent(idx, "name", v)}
                                                             autoComplete="off"
                                                         />
                                                         <TextField
-                                                            label="Ruolo"
+                                                            label={t.agentRole}
                                                             value={agent.role}
                                                             onChange={(v) => updateAgent(idx, "role", v)}
                                                             autoComplete="off"
-                                                            placeholder="es. Supporto, Vendite"
+                                                            placeholder={t.agentRolePlaceholder}
                                                         />
                                                         <TextField
-                                                            label="Numero WhatsApp"
+                                                            label={t.agentPhone}
                                                             value={agent.phone}
                                                             onChange={(v) => updateAgent(idx, "phone", v)}
                                                             autoComplete="off"
                                                             placeholder="+39..."
                                                         />
                                                         <TextField
-                                                            label="URL Avatar (opzionale)"
+                                                            label={t.agentAvatar}
                                                             value={agent.avatar}
                                                             onChange={(v) => updateAgent(idx, "avatar", v)}
                                                             autoComplete="off"
@@ -421,7 +421,7 @@ export default function Settings() {
                                             </Card>
                                         ))}
                                         {agents.length < 5 && (
-                                            <Button onClick={addAgent}>+ Aggiungi agente</Button>
+                                            <Button onClick={addAgent}>{t.agentAdd}</Button>
                                         )}
                                     </BlockStack>
                                 )}
@@ -434,7 +434,7 @@ export default function Settings() {
                 <Layout.Section variant="oneThird">
                     <Card>
                         <BlockStack gap="400">
-                            <Text as="h2" variant="headingMd">Anteprima Live</Text>
+                            <Text as="h2" variant="headingMd">{t.previewTitle}</Text>
                             <div style={{
                                 width: "100%", height: "220px", backgroundColor: "#f4f6f8",
                                 position: "relative", borderRadius: "8px", border: "1px solid #dfe3e8", overflow: "hidden"
@@ -455,7 +455,7 @@ export default function Settings() {
                                     </svg>
                                 </div>
                             </div>
-                            <Text as="p" tone="subdued">L'anteprima è approssimativa. Vedi il tuo negozio per il risultato finale.</Text>
+                            <Text as="p" tone="subdued">{t.previewInfo}</Text>
                         </BlockStack>
                     </Card>
                 </Layout.Section>

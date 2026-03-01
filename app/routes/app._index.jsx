@@ -9,12 +9,12 @@ import {
   BlockStack,
   InlineStack,
   Badge,
-  DataTable,
   Divider,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
+import { getTranslations } from "../translations";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -39,16 +39,21 @@ export const loader = async ({ request }) => {
     // ClickEvent table may not exist yet if migration hasn't run
   }
 
+  // Determine locale for date formatting based on language
+  const lang = settings.language || "it";
+  const localeMap = { it: "it-IT", en: "en-US", es: "es-ES", de: "de-DE", fr: "fr-FR", pt: "pt-PT" };
+  const locale = localeMap[lang] || "it-IT";
+
   // Group by day
   const clicksByDay = {};
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const key = d.toLocaleDateString("it-IT", { weekday: "short", day: "numeric" });
+    const key = d.toLocaleDateString(locale, { weekday: "short", day: "numeric" });
     clicksByDay[key] = 0;
   }
   clickEvents.forEach((e) => {
-    const key = new Date(e.createdAt).toLocaleDateString("it-IT", { weekday: "short", day: "numeric" });
+    const key = new Date(e.createdAt).toLocaleDateString(locale, { weekday: "short", day: "numeric" });
     if (clicksByDay[key] !== undefined) clicksByDay[key]++;
   });
 
@@ -64,6 +69,7 @@ export const loader = async ({ request }) => {
     isEnabled: settings.isEnabled,
     hasPhoneNumber: !!settings.phoneNumber,
     plan: settings.plan || "free",
+    language: settings.language || "it",
     shop,
   });
 };
@@ -106,15 +112,17 @@ function BarChart({ data }) {
 export default function Index() {
   const {
     totalClicks, recentClicks, mobileClicks, desktopClicks,
-    clicksByDay, isEnabled, hasPhoneNumber, plan, shop,
+    clicksByDay, isEnabled, hasPhoneNumber, plan, language, shop,
   } = useLoaderData();
   const navigate = useNavigate();
 
+  const t = getTranslations(language).dashboard;
+  const tNav = getTranslations(language).nav;
   const mobilePct = recentClicks > 0 ? Math.round((mobileClicks / recentClicks) * 100) : 0;
 
   return (
     <Page>
-      <TitleBar title="WhatsApp Chat Button – Dashboard" />
+      <TitleBar title={`WhatsApp Chat Button – ${t.title}`} />
       <BlockStack gap="500">
         {/* Status Banner */}
         <Card>
@@ -124,18 +132,18 @@ export default function Index() {
                 <Text as="h2" variant="headingMd">📱 WhatsApp Chat Button</Text>
                 <InlineStack gap="200">
                   <Badge tone={isEnabled ? "success" : "warning"}>
-                    {isEnabled ? "Attivo" : "Inattivo"}
+                    {isEnabled ? "✓" : "✗"}
                   </Badge>
                   <Badge tone={plan === "pro" ? "info" : "new"}>
-                    {plan === "pro" ? "✨ Pro" : "Free"}
+                    {plan === "pro" ? `✨ ${t.pro}` : t.free}
                   </Badge>
                 </InlineStack>
               </BlockStack>
               <InlineStack gap="200">
-                <Button onClick={() => navigate("/app/settings")}>Impostazioni</Button>
+                <Button onClick={() => navigate("/app/settings")}>{tNav.settings}</Button>
                 {plan !== "pro" && (
                   <Button variant="primary" onClick={() => navigate("/app/pricing")}>
-                    Passa a Pro
+                    {t.upgradeCta}
                   </Button>
                 )}
               </InlineStack>
@@ -144,9 +152,14 @@ export default function Index() {
               <>
                 <Divider />
                 <Text tone="caution">
-                  ⚠️ Nessun numero WhatsApp configurato. Il pulsante non sarà visibile!{" "}
+                  ⚠️ {language === "it" ? "Nessun numero WhatsApp configurato. Il pulsante non sarà visibile!" :
+                    language === "en" ? "No WhatsApp number configured. The button won't be visible!" :
+                      language === "es" ? "Ningún número de WhatsApp configurado. ¡El botón no será visible!" :
+                        language === "de" ? "Keine WhatsApp-Nummer konfiguriert. Der Button wird nicht sichtbar sein!" :
+                          language === "fr" ? "Aucun numéro WhatsApp configuré. Le bouton ne sera pas visible !" :
+                            "Nenhum número WhatsApp configurado. O botão não será visível!"}{" "}
                   <Button variant="plain" onClick={() => navigate("/app/settings")}>
-                    Configura ora →
+                    {tNav.settings} →
                   </Button>
                 </Text>
               </>
@@ -160,19 +173,19 @@ export default function Index() {
             <BlockStack gap="400">
               <Card>
                 <BlockStack gap="200">
-                  <Text tone="subdued" as="p">Click totali</Text>
+                  <Text tone="subdued" as="p">{t.totalClicks}</Text>
                   <Text variant="heading2xl" as="p" fontWeight="bold">{totalClicks}</Text>
                 </BlockStack>
               </Card>
               <Card>
                 <BlockStack gap="200">
-                  <Text tone="subdued" as="p">Ultimi 7 giorni</Text>
+                  <Text tone="subdued" as="p">{t.last7Days}</Text>
                   <Text variant="heading2xl" as="p" fontWeight="bold">{recentClicks}</Text>
                 </BlockStack>
               </Card>
               <Card>
                 <BlockStack gap="200">
-                  <Text tone="subdued" as="p">📱 Mobile</Text>
+                  <Text tone="subdued" as="p">📱 {t.mobilePercent}</Text>
                   <Text variant="headingXl" as="p" fontWeight="bold">{mobilePct}%</Text>
                   <Text tone="subdued" as="p">{mobileClicks} mobile · {desktopClicks} desktop</Text>
                 </BlockStack>
@@ -184,9 +197,9 @@ export default function Index() {
           <Layout.Section>
             <Card>
               <BlockStack gap="400">
-                <Text as="h2" variant="headingMd">📊 Click ultimi 7 giorni</Text>
+                <Text as="h2" variant="headingMd">📊 {t.last7Days}</Text>
                 {recentClicks === 0 ? (
-                  <Text tone="subdued">Nessun click registrato negli ultimi 7 giorni. Assicurati che il widget sia attivo sul tuo negozio.</Text>
+                  <Text tone="subdued">{t.noData}</Text>
                 ) : (
                   <BarChart data={clicksByDay} />
                 )}
@@ -199,12 +212,12 @@ export default function Index() {
         {plan !== "pro" && (
           <Card>
             <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">🚀 Sblocca tutto con Pro</Text>
+              <Text as="h2" variant="headingMd">🚀 {t.upgradeCta}</Text>
               <Text tone="subdued">
-                Orari di disponibilità · Multi-agente · Analytics avanzati · Messaggio smart con nome prodotto · Click illimitati
+                {t.upgradeBanner}
               </Text>
               <Button variant="primary" onClick={() => navigate("/app/pricing")}>
-                Inizia la prova gratuita di 7 giorni →
+                {t.upgradeCta} →
               </Button>
             </BlockStack>
           </Card>
