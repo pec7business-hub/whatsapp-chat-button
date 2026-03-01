@@ -273,11 +273,11 @@
     const shop = window.Shopify && window.Shopify.shop;
     if (!shop) return;
 
-    const apiUrl = "https://whatsapp-chat-button-production-1271.up.railway.app";
+    const proxyUrl = "/apps/whatsapp/api/proxy";
 
     let config;
     try {
-      const res = await fetch(`${apiUrl}/api/widget-config/${shop}`);
+      const res = await fetch(`${proxyUrl}/widget-config/${shop}`);
       if (!res.ok) return;
       config = await res.json();
     } catch (e) {
@@ -540,7 +540,7 @@
     // Click tracking
     function trackClick() {
       const deviceType = isMobile ? "mobile" : "desktop";
-      fetch(`${apiUrl}/api/track-click`, {
+      fetch(`${proxyUrl}/track-click`, {
         method: "POST",
         keepalive: true,
         headers: { "Content-Type": "application/json" },

@@ -26,3 +26,8 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [ "https://whatsapp-chat-button-production-1271.up.railway.app/api/auth" ]
+
+[app_proxy]
+url = "https://whatsapp-chat-button-production-1271.up.railway.app"
+subpath = "whatsapp"
+prefix = "apps"

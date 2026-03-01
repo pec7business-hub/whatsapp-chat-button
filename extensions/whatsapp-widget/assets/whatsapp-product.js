@@ -2,11 +2,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     const shop = window.Shopify && window.Shopify.shop;
     if (!shop) return;
 
-    const apiUrl = "https://whatsapp-chat-button-production-1271.up.railway.app";
+    // We use the Shopify App Proxy relative URL for all calls
+    const proxyUrl = "/apps/whatsapp/api/proxy";
+
+    const container = document.getElementById("wa-product-button-container");
+    if (!container) return;
 
     let config;
     try {
-        const res = await fetch(`${apiUrl}/api/widget-config/${shop}`);
+        const res = await fetch(`${proxyUrl}/widget-config/${shop}`);
         if (!res.ok) return;
         config = await res.json();
     } catch (e) {
@@ -15,11 +19,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (!config.isEnabled || !config.productButtonEnabled) return;
 
-    const container = document.getElementById("wa-product-button-container");
     const button = document.getElementById("wa-product-button");
     const textSpan = document.getElementById("wa-product-button-text");
 
-    if (!container || !button || !textSpan) return;
+    if (!button || !textSpan) return;
 
     // Apply color and text
     const color = config.buttonColor || "#25D366";
@@ -52,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // Track click
         button.addEventListener("click", () => {
-            fetch(`${apiUrl}/api/track-click`, {
+            fetch(`${proxyUrl}/track-click`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ shop, deviceType: window.innerWidth <= 768 ? "mobile" : "desktop", page: window.location.pathname }),

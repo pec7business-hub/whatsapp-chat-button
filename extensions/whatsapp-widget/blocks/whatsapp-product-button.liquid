@@ -8,7 +8,10 @@
 }
 {% endschema %}
 
-<div id="wa-product-button-container" style="display: none; margin-top: 15px; margin-bottom: 15px; width: 100%;" data-product-title="{{ product.title | escape | replace: '\"', '\\\"' }}">
+<!-- We use a relative app proxy path if installed, or we pass a specific data attribute for the script to use -->
+<div id="wa-product-button-container" style="display: none; margin-top: 15px; margin-bottom: 15px; width: 100%;" 
+     data-product-title="{{ product.title | escape | replace: '"', '&quot;' | replace: "'", '&#39;' }}"
+     data-api-url="{{ request.origin }}/apps/whatsapp-chat">
   <a id="wa-product-button" href="#" target="_blank" style="
     display: flex;
     justify-content: center;
