@@ -72,9 +72,9 @@ export const action = async ({ request }) => {
         offlineMessage: formData.get("offlineMessage") || "",
         // Product Button
         productButtonEnabled: formData.get("productButtonEnabled") === "true",
-        productButtonLabel: formData.get("productButtonLabel") || "Chiedi su WhatsApp",
+        productButtonLabel: formData.get("productButtonLabel") || "Ask on WhatsApp",
         shareButtonEnabled: formData.get("shareButtonEnabled") === "true",
-        shareButtonLabel: formData.get("shareButtonLabel") || "Condividi con un amico",
+        shareButtonLabel: formData.get("shareButtonLabel") || "Share with a friend",
         // Agents & FAQ
         agents,
         faqEnabled: formData.get("faqEnabled") === "true",
@@ -158,6 +158,8 @@ export default function Settings() {
             defaultMessage: msgs.defaultMessage,
             tooltipText: msgs.tooltipText,
             offlineMessage: msgs.offlineMessage,
+            productButtonLabel: msgs.productButtonLabel,
+            shareButtonLabel: msgs.shareButtonLabel,
         }));
     };
 
@@ -263,7 +265,7 @@ export default function Settings() {
                                         {formState.productButtonEnabled && (
                                             <TextField
                                                 label={t.productButtonLabelLabel}
-                                                value={formState.productButtonLabel || "Chiedi su WhatsApp"}
+                                                value={formState.productButtonLabel || "Ask on WhatsApp"}
                                                 onChange={(val) => handleChange(val, "productButtonLabel")}
                                                 autoComplete="off"
                                             />
@@ -277,7 +279,7 @@ export default function Settings() {
                                         {(formState.shareButtonEnabled ?? true) && (
                                             <TextField
                                                 label={t.shareButtonLabelLabel}
-                                                value={formState.shareButtonLabel || "Condividi con un amico"}
+                                                value={formState.shareButtonLabel || "Share with a friend"}
                                                 onChange={(val) => handleChange(val, "shareButtonLabel")}
                                                 autoComplete="off"
                                             />

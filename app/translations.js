@@ -672,31 +672,43 @@ export const defaultMessages = {
         defaultMessage: "Hi! I have a question about...",
         tooltipText: "Chat with us!",
         offlineMessage: "We're offline. Leave us a message!",
+        productButtonLabel: "Ask on WhatsApp",
+        shareButtonLabel: "Share with a friend",
     },
     it: {
         defaultMessage: "Ciao! Ho una domanda riguardo...",
         tooltipText: "Chatta con noi!",
         offlineMessage: "Siamo offline. Lasciaci un messaggio!",
+        productButtonLabel: "Chiedi su WhatsApp",
+        shareButtonLabel: "Condividi con un amico",
     },
     es: {
         defaultMessage: "¡Hola! Tengo una pregunta sobre...",
         tooltipText: "¡Chatea con nosotros!",
         offlineMessage: "Estamos desconectados. ¡Déjanos un mensaje!",
+        productButtonLabel: "Preguntar por WhatsApp",
+        shareButtonLabel: "Compartir con un amigo",
     },
     de: {
         defaultMessage: "Hallo! Ich habe eine Frage zu...",
         tooltipText: "Chatte mit uns!",
         offlineMessage: "Wir sind offline. Hinterlassen Sie uns eine Nachricht!",
+        productButtonLabel: "Auf WhatsApp fragen",
+        shareButtonLabel: "Mit einem Freund teilen",
     },
     fr: {
         defaultMessage: "Bonjour ! J'ai une question à propos de...",
         tooltipText: "Discutez avec nous !",
         offlineMessage: "Nous sommes hors ligne. Laissez-nous un message !",
+        productButtonLabel: "Demander sur WhatsApp",
+        shareButtonLabel: "Partager avec un ami",
     },
     pt: {
         defaultMessage: "Olá! Tenho uma pergunta sobre...",
         tooltipText: "Fale conosco!",
         offlineMessage: "Estamos offline. Deixe-nos uma mensagem!",
+        productButtonLabel: "Perguntar no WhatsApp",
+        shareButtonLabel: "Compartilhar com um amigo",
     },
 };
 

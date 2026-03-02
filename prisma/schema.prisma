@@ -76,11 +76,11 @@ model Settings {
 
   // Pulsante In-Page Pagina Prodotto
   productButtonEnabled Boolean @default(false)
-  productButtonLabel   String  @default("Chiedi su WhatsApp")
+  productButtonLabel   String  @default("Ask on WhatsApp")
 
   // Pulsante Condividi Pagina Prodotto
   shareButtonEnabled   Boolean @default(true)
-  shareButtonLabel     String  @default("Condividi con un amico")
+  shareButtonLabel     String  @default("Share with a friend")
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
