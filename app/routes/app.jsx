@@ -5,11 +5,14 @@ import { NavMenu } from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import { authenticate, MONTHLY_PLAN } from "../shopify.server";
 import db from "../db.server";
+import { getTranslations } from "../translations";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }) => {
   const { billing, session } = await authenticate.admin(request);
+
+  let language = "en";
 
   // Check billing status
   let billingStatus = { hasActivePayment: false, trialDaysLeft: null };
@@ -30,6 +33,7 @@ export const loader = async ({ request }) => {
     try {
       const currentSettings = await db.settings.findUnique({ where: { shop: session.shop } });
       if (currentSettings) {
+        language = currentSettings.language || "en";
         const newPlan = hasActivePayment ? "pro" : "free";
         if (currentSettings.plan !== newPlan) {
           await db.settings.update({
@@ -44,26 +48,34 @@ export const loader = async ({ request }) => {
   } catch {
     // billing not configured yet, allow access
     billingStatus.hasActivePayment = true;
+    try {
+      const fallbackSettings = await db.settings.findUnique({ where: { shop: session.shop } });
+      if (fallbackSettings) {
+        language = fallbackSettings.language || "en";
+      }
+    } catch (e) { }
   }
 
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
     hasActivePayment: billingStatus.hasActivePayment,
     trialDaysLeft: billingStatus.trialDaysLeft,
+    language,
   };
 };
 
 export default function App() {
-  const { apiKey } = useLoaderData();
+  const { apiKey, language } = useLoaderData();
+  const t = getTranslations(language || "en").nav;
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
       <NavMenu>
         <Link to="/app" rel="home">
-          Dashboard
+          {t.dashboard}
         </Link>
-        <Link to="/app/settings">Impostazioni</Link>
-        <Link to="/app/pricing">Piani</Link>
+        <Link to="/app/settings">{t.settings}</Link>
+        <Link to="/app/pricing">{t.pricing}</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>
