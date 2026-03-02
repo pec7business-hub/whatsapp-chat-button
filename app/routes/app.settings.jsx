@@ -73,6 +73,8 @@ export const action = async ({ request }) => {
         // Product Button
         productButtonEnabled: formData.get("productButtonEnabled") === "true",
         productButtonLabel: formData.get("productButtonLabel") || "Chiedi su WhatsApp",
+        shareButtonEnabled: formData.get("shareButtonEnabled") === "true",
+        shareButtonLabel: formData.get("shareButtonLabel") || "Condividi con un amico",
         // Agents & FAQ
         agents,
         faqEnabled: formData.get("faqEnabled") === "true",
@@ -263,6 +265,20 @@ export default function Settings() {
                                                 label={t.productButtonLabelLabel}
                                                 value={formState.productButtonLabel || "Chiedi su WhatsApp"}
                                                 onChange={(val) => handleChange(val, "productButtonLabel")}
+                                                autoComplete="off"
+                                            />
+                                        )}
+                                        <Divider />
+                                        <Checkbox
+                                            label={t.shareButtonEnable}
+                                            checked={formState.shareButtonEnabled ?? true}
+                                            onChange={(val) => handleChange(val, "shareButtonEnabled")}
+                                        />
+                                        {(formState.shareButtonEnabled ?? true) && (
+                                            <TextField
+                                                label={t.shareButtonLabelLabel}
+                                                value={formState.shareButtonLabel || "Condividi con un amico"}
+                                                onChange={(val) => handleChange(val, "shareButtonLabel")}
                                                 autoComplete="off"
                                             />
                                         )}

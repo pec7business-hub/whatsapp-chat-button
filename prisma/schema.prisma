@@ -78,6 +78,10 @@ model Settings {
   productButtonEnabled Boolean @default(false)
   productButtonLabel   String  @default("Chiedi su WhatsApp")
 
+  // Pulsante Condividi Pagina Prodotto
+  shareButtonEnabled   Boolean @default(true)
+  shareButtonLabel     String  @default("Condividi con un amico")
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

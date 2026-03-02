@@ -63,6 +63,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    // Show button
+    // Configure Share Button if enabled
+    const shareButton = document.getElementById("wa-share-button");
+    const shareTextSpan = document.getElementById("wa-share-button-text");
+    if (config.shareButtonEnabled && shareButton && shareTextSpan) {
+        shareButton.style.display = "flex";
+        shareTextSpan.textContent = config.shareButtonLabel || "Condividi con un amico";
+        // Pre-fill a native WhatsApp share message without a target phone number
+        const shareMessage = `Guarda questo prodotto, secondo me ti piace!\n\n${productName}\n${productUrl}`;
+        shareButton.href = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
+    }
+
+    // Show button container
     container.style.display = "block";
 });

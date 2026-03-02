@@ -83,6 +83,8 @@ export async function loader({ request }) {
             language: settings.language || "en",
             productButtonEnabled: settings.productButtonEnabled && settings.plan === "pro",
             productButtonLabel: settings.productButtonLabel || "Chiedi su WhatsApp",
+            shareButtonEnabled: settings.shareButtonEnabled ?? true,
+            shareButtonLabel: settings.shareButtonLabel || "Condividi con un amico",
         });
     }
 
