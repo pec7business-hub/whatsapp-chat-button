@@ -75,7 +75,8 @@ export default function App() {
           {t.dashboard}
         </Link>
         <Link to="/app/settings">{t.settings}</Link>
-        <Link to="/app/pricing">{t.pricing}</Link>
+        {/* <Link to="/app/pricing">{t.pricing}</Link> - Hidden for 100% Free Launch */}
+        <Link to="/app/support">{t.support || "Support"}</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>

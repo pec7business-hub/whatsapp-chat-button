@@ -8,7 +8,26 @@ const translations = {
         nav: {
             dashboard: "Dashboard",
             settings: "Impostazioni",
-            pricing: "Piani e Prezzi",
+            pricing: "Piani",
+            support: "Supporto e Aiuto",
+        },
+        support: {
+            pageTitle: "Supporto",
+            needHelpHeader: "Hai bisogno di una mano?",
+            needHelpDescription: "Se ti serve aiuto con la configurazione o vuoi semplicemente segnalare un bug, siamo qui per te. Rispondiamo in meno di 24 ore.",
+            contactButtonText: "Contattaci ora",
+            emailAddress: "Oppure scrivi direttamente a",
+            quickGuideHeader: "Guida Rapida",
+            issue1Title: "Non vedo il widget sul negozio",
+            issue1Desc: "Assicurati di aver attivato il blocco App Embed nell'editor del tema. Vai su Negozio Online > Temi > Personalizza > incorporazioni app.",
+            issue2Title: "I grafici non si aggiornano subito",
+            issue2Desc: "I nuovi click potrebbero impiegare qualche minuto per apparire nel grafico. Prova a ricaricare la pagina.",
+            issue3Title: "Manca il tasto Condividi",
+            issue3Desc: "Assicurati di aver spuntato l'opzione 'Pulsante Condividi Pagina' nelle impostazioni e aver salvato.",
+            issue4Title: "Quale formato per il numero di telefono?",
+            issue4Desc: "Inserisci il tuo numero completo con il prefisso internazionale (es. 39 per l'Italia), ma SENZA il simbolo '+' o '00' all'inizio.",
+            issue5Title: "Come traduco i messaggi?",
+            issue5Desc: "Ogni campo di testo nelle Impostazioni (incluso il messaggio precompilato) può essere personalizzato manualmente per ogni lingua."
         },
         // Dashboard
         dashboard: {
@@ -126,7 +145,26 @@ const translations = {
         nav: {
             dashboard: "Dashboard",
             settings: "Settings",
-            pricing: "Plans & Pricing",
+            pricing: "Plans",
+            support: "Support & Help",
+        },
+        support: {
+            pageTitle: "Help & Support",
+            needHelpHeader: "Need a hand?",
+            needHelpDescription: "Whether you need help with setup, have a feature request, or just want to report a bug, we are here for you. We usually reply within 24 hours.",
+            contactButtonText: "Email Support Now",
+            emailAddress: "Or write directly to",
+            quickGuideHeader: "Quick Troubleshooting Guide",
+            issue1Title: "I can't see the widget on my store",
+            issue1Desc: "Ensure you have enabled the App Embed block in your Shopify Theme Editor. Go to Online Store > Themes > Customize > App Embeds.",
+            issue2Title: "Click analytics are not updating instantly",
+            issue2Desc: "It might take a few minutes for new clicks to appear on your dashboard. Try refreshing the page.",
+            issue3Title: "The product share button is missing",
+            issue3Desc: "Make sure you have enabled the 'Share Button' option in the Settings panel and saved the changes.",
+            issue4Title: "What phone number format should I use?",
+            issue4Desc: "Enter your full phone number including the country code (e.g., 1 for US, 44 for UK), but WITHOUT the '+' or '00' at the beginning.",
+            issue5Title: "How do I translate the messages?",
+            issue5Desc: "Every custom text field in the Settings panel (including the pre-filled message) can be translated and adjusted by you."
         },
         dashboard: {
             title: "Dashboard",
@@ -234,7 +272,26 @@ const translations = {
         nav: {
             dashboard: "Panel",
             settings: "Configuración",
-            pricing: "Planes y Precios",
+            pricing: "Planes",
+            support: "Ayuda y Soporte",
+        },
+        support: {
+            pageTitle: "Soporte",
+            needHelpHeader: "¿Necesitas ayuda?",
+            needHelpDescription: "Ya sea que necesites ayuda con la configuración o quieras reportar un error, estamos aquí. Respondemos habitualmente en 24 horas.",
+            contactButtonText: "Enviar correo ahora",
+            emailAddress: "O escribe directamente a",
+            quickGuideHeader: "Guía Rápida",
+            issue1Title: "No veo el widget en mi tienda",
+            issue1Desc: "Asegúrate de haber habilitado la extensión en el editor de temas de Shopify (App embeds).",
+            issue2Title: "Los gráficos no se actualizan en vivo",
+            issue2Desc: "Los nuevos clics pueden tardar unos minutos en reflejarse. Intenta recargar la página.",
+            issue3Title: "Falta el botón de Compartir",
+            issue3Desc: "Asegúrate de haber habilitado la opción 'Compartir' en el panel de configuración.",
+            issue4Title: "¿Qué formato de número de teléfono debo usar?",
+            issue4Desc: "Ingresa tu número completo con el código de país (ej. 34 para España, 52 para México), pero SIN el símbolo '+' o '00' al principio.",
+            issue5Title: "¿Cómo traduzco los mensajes?",
+            issue5Desc: "Cada campo de texto en el panel de Configuración se puede personalizar y adaptar al idioma que desees."
         },
         dashboard: {
             title: "Panel",

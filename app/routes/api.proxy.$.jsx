@@ -81,7 +81,7 @@ export async function loader({ request }) {
             faqItems,
             plan: settings.plan,
             language: settings.language || "en",
-            productButtonEnabled: settings.productButtonEnabled && settings.plan === "pro",
+            productButtonEnabled: settings.productButtonEnabled, // && settings.plan === "pro", // Unleashed for Launch
             productButtonLabel: settings.productButtonLabel || "Ask on WhatsApp",
             shareButtonEnabled: settings.shareButtonEnabled ?? true,
             shareButtonLabel: settings.shareButtonLabel || "Share with a friend",

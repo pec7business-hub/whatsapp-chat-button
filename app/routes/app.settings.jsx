@@ -114,7 +114,8 @@ export default function Settings() {
     const shopify = useAppBridge();
 
     const isSaving = navigation.state === "submitting";
-    const isPro = settings.plan === "pro";
+    // For Phase 1 Launch: Everyone is considered Pro (Grandfathering strategy)
+    const isPro = true; // settings.plan === "pro";
 
     const [formState, setFormState] = useState({
         ...settings,
