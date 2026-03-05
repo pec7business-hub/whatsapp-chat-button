@@ -98,7 +98,7 @@ export async function action({ request }) {
     if (path.endsWith("/track-click")) {
         try {
             const body = await request.json();
-            const { shop, deviceType = "unknown", page = "/" } = body;
+            const { shop, deviceType = "unknown", page = "/", productTitle } = body;
 
             if (!shop) return json({ error: "Missing shop" }, { status: 400 });
 
@@ -107,6 +107,7 @@ export async function action({ request }) {
                     shop,
                     deviceType: deviceType || "unknown",
                     page: page || "/",
+                    productTitle: productTitle || null,
                 },
             });
 
