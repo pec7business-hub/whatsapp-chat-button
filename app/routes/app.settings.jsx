@@ -114,8 +114,6 @@ export default function Settings() {
     const shopify = useAppBridge();
 
     const isSaving = navigation.state === "submitting";
-    // For Phase 1 Launch: Everyone is considered Pro (Grandfathering strategy)
-    const isPro = true; // settings.plan === "pro";
 
     const [formState, setFormState] = useState({
         ...settings,
@@ -246,47 +244,39 @@ export default function Settings() {
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
                                     <Text as="h2" variant="headingMd">{t.productButtonTitle}</Text>
-                                    {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
-                                {!isPro ? (
+                                <BlockStack gap="400">
                                     <Banner tone="info">
-                                        {t.productButtonUpgrade}{" "}
-                                        <a href="/app/pricing">{t.seePlans}</a>
+                                        {t.productButtonHelp}
                                     </Banner>
-                                ) : (
-                                    <BlockStack gap="400">
-                                        <Banner tone="info">
-                                            {t.productButtonHelp}
-                                        </Banner>
-                                        <Checkbox
-                                            label={t.productButtonEnable}
-                                            checked={formState.productButtonEnabled}
-                                            onChange={(val) => handleChange(val, "productButtonEnabled")}
+                                    <Checkbox
+                                        label={t.productButtonEnable}
+                                        checked={formState.productButtonEnabled}
+                                        onChange={(val) => handleChange(val, "productButtonEnabled")}
+                                    />
+                                    {formState.productButtonEnabled && (
+                                        <TextField
+                                            label={t.productButtonLabelLabel}
+                                            value={formState.productButtonLabel || "Ask on WhatsApp"}
+                                            onChange={(val) => handleChange(val, "productButtonLabel")}
+                                            autoComplete="off"
                                         />
-                                        {formState.productButtonEnabled && (
-                                            <TextField
-                                                label={t.productButtonLabelLabel}
-                                                value={formState.productButtonLabel || "Ask on WhatsApp"}
-                                                onChange={(val) => handleChange(val, "productButtonLabel")}
-                                                autoComplete="off"
-                                            />
-                                        )}
-                                        <Divider />
-                                        <Checkbox
-                                            label={t.shareButtonEnable}
-                                            checked={formState.shareButtonEnabled ?? true}
-                                            onChange={(val) => handleChange(val, "shareButtonEnabled")}
+                                    )}
+                                    <Divider />
+                                    <Checkbox
+                                        label={t.shareButtonEnable}
+                                        checked={formState.shareButtonEnabled ?? true}
+                                        onChange={(val) => handleChange(val, "shareButtonEnabled")}
+                                    />
+                                    {(formState.shareButtonEnabled ?? true) && (
+                                        <TextField
+                                            label={t.shareButtonLabelLabel}
+                                            value={formState.shareButtonLabel || "Share with a friend"}
+                                            onChange={(val) => handleChange(val, "shareButtonLabel")}
+                                            autoComplete="off"
                                         />
-                                        {(formState.shareButtonEnabled ?? true) && (
-                                            <TextField
-                                                label={t.shareButtonLabelLabel}
-                                                value={formState.shareButtonLabel || "Share with a friend"}
-                                                onChange={(val) => handleChange(val, "shareButtonLabel")}
-                                                autoComplete="off"
-                                            />
-                                        )}
-                                    </BlockStack>
-                                )}
+                                    )}
+                                </BlockStack>
                             </BlockStack>
                         </Card>
 
@@ -374,21 +364,13 @@ export default function Settings() {
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
                                     <Text as="h2" variant="headingMd">{t.availabilityTitle}</Text>
-                                    {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
-                                {!isPro && (
-                                    <Banner tone="info">
-                                        {t.availabilityUpgrade}{" "}
-                                        <a href="/app/pricing">{t.seePlans}</a>
-                                    </Banner>
-                                )}
                                 <Checkbox
                                     label={t.availabilityEnable}
                                     checked={formState.availabilityEnabled}
                                     onChange={(val) => handleChange(val, "availabilityEnabled")}
-                                    disabled={!isPro}
                                 />
-                                {formState.availabilityEnabled && isPro && (
+                                {formState.availabilityEnabled && (
                                     <BlockStack gap="400">
                                         <Select
                                             label={t.timezone}
@@ -442,63 +424,55 @@ export default function Settings() {
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
                                     <Text as="h2" variant="headingMd">{t.agentTitle}</Text>
-                                    {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
-                                {!isPro ? (
-                                    <Banner tone="info">
-                                        {t.agentUpgrade}{" "}
-                                        <a href="/app/pricing">{t.seePlans}</a>
-                                    </Banner>
-                                ) : (
-                                    <BlockStack gap="400">
-                                        <Text tone="subdued">
-                                            {t.agentInfo}
-                                        </Text>
-                                        {agents.map((agent, idx) => (
-                                            <Card key={idx}>
-                                                <BlockStack gap="300">
-                                                    <InlineStack align="space-between">
-                                                        <Text variant="headingSm">{t.agentLabel} {idx + 1}</Text>
-                                                        <Button tone="critical" size="slim" onClick={() => removeAgent(idx)}>
-                                                            {t.agentRemove}
-                                                        </Button>
-                                                    </InlineStack>
-                                                    <InlineGrid columns={2} gap="300">
-                                                        <TextField
-                                                            label={t.agentName}
-                                                            value={agent.name}
-                                                            onChange={(v) => updateAgent(idx, "name", v)}
-                                                            autoComplete="off"
-                                                        />
-                                                        <TextField
-                                                            label={t.agentRole}
-                                                            value={agent.role}
-                                                            onChange={(v) => updateAgent(idx, "role", v)}
-                                                            autoComplete="off"
-                                                            placeholder={t.agentRolePlaceholder}
-                                                        />
-                                                        <TextField
-                                                            label={t.agentPhone}
-                                                            value={agent.phone}
-                                                            onChange={(v) => updateAgent(idx, "phone", v)}
-                                                            autoComplete="off"
-                                                            placeholder="+39..."
-                                                        />
-                                                        <TextField
-                                                            label={t.agentAvatar}
-                                                            value={agent.avatar}
-                                                            onChange={(v) => updateAgent(idx, "avatar", v)}
-                                                            autoComplete="off"
-                                                        />
-                                                    </InlineGrid>
-                                                </BlockStack>
-                                            </Card>
-                                        ))}
-                                        {agents.length < 5 && (
-                                            <Button onClick={addAgent}>{t.agentAdd}</Button>
-                                        )}
-                                    </BlockStack>
-                                )}
+                                <BlockStack gap="400">
+                                    <Text tone="subdued">
+                                        {t.agentInfo}
+                                    </Text>
+                                    {agents.map((agent, idx) => (
+                                        <Card key={idx}>
+                                            <BlockStack gap="300">
+                                                <InlineStack align="space-between">
+                                                    <Text variant="headingSm">{t.agentLabel} {idx + 1}</Text>
+                                                    <Button tone="critical" size="slim" onClick={() => removeAgent(idx)}>
+                                                        {t.agentRemove}
+                                                    </Button>
+                                                </InlineStack>
+                                                <InlineGrid columns={2} gap="300">
+                                                    <TextField
+                                                        label={t.agentName}
+                                                        value={agent.name}
+                                                        onChange={(v) => updateAgent(idx, "name", v)}
+                                                        autoComplete="off"
+                                                    />
+                                                    <TextField
+                                                        label={t.agentRole}
+                                                        value={agent.role}
+                                                        onChange={(v) => updateAgent(idx, "role", v)}
+                                                        autoComplete="off"
+                                                        placeholder={t.agentRolePlaceholder}
+                                                    />
+                                                    <TextField
+                                                        label={t.agentPhone}
+                                                        value={agent.phone}
+                                                        onChange={(v) => updateAgent(idx, "phone", v)}
+                                                        autoComplete="off"
+                                                        placeholder="+39..."
+                                                    />
+                                                    <TextField
+                                                        label={t.agentAvatar}
+                                                        value={agent.avatar}
+                                                        onChange={(v) => updateAgent(idx, "avatar", v)}
+                                                        autoComplete="off"
+                                                    />
+                                                </InlineGrid>
+                                            </BlockStack>
+                                        </Card>
+                                    ))}
+                                    {agents.length < 5 && (
+                                        <Button onClick={addAgent}>{t.agentAdd}</Button>
+                                    )}
+                                </BlockStack>
                             </BlockStack>
                         </Card>
 
@@ -507,61 +481,53 @@ export default function Settings() {
                             <BlockStack gap="400">
                                 <InlineStack gap="200" align="space-between">
                                     <Text as="h2" variant="headingMd">{t.faqTitle}</Text>
-                                    {!isPro && <Badge tone="warning">Pro</Badge>}
                                 </InlineStack>
-                                {!isPro ? (
-                                    <Banner tone="info">
-                                        {t.faqUpgrade}{" "}
-                                        <a href="/app/pricing">{t.seePlans}</a>
-                                    </Banner>
-                                ) : (
-                                    <BlockStack gap="400">
-                                        <Text tone="subdued">
-                                            {t.faqInfo}
-                                        </Text>
-                                        <Checkbox
-                                            label={t.faqEnable}
-                                            checked={formState.faqEnabled}
-                                            onChange={(val) => handleChange(val, "faqEnabled")}
-                                        />
-                                        {formState.faqEnabled && (
-                                            <BlockStack gap="400">
-                                                {faqItems.map((faq, idx) => (
-                                                    <Card key={idx}>
+                                <BlockStack gap="400">
+                                    <Text tone="subdued">
+                                        {t.faqInfo}
+                                    </Text>
+                                    <Checkbox
+                                        label={t.faqEnable}
+                                        checked={formState.faqEnabled}
+                                        onChange={(val) => handleChange(val, "faqEnabled")}
+                                    />
+                                    {formState.faqEnabled && (
+                                        <BlockStack gap="400">
+                                            {faqItems.map((faq, idx) => (
+                                                <Card key={idx}>
+                                                    <BlockStack gap="300">
+                                                        <InlineStack align="space-between">
+                                                            <Text variant="headingSm">{t.faqItem} {idx + 1}</Text>
+                                                            <Button tone="critical" size="slim" onClick={() => removeFaq(idx)}>
+                                                                {t.faqRemove}
+                                                            </Button>
+                                                        </InlineStack>
                                                         <BlockStack gap="300">
-                                                            <InlineStack align="space-between">
-                                                                <Text variant="headingSm">{t.faqItem} {idx + 1}</Text>
-                                                                <Button tone="critical" size="slim" onClick={() => removeFaq(idx)}>
-                                                                    {t.faqRemove}
-                                                                </Button>
-                                                            </InlineStack>
-                                                            <BlockStack gap="300">
-                                                                <TextField
-                                                                    label={t.faqQuestion}
-                                                                    value={faq.question}
-                                                                    onChange={(v) => updateFaq(idx, "question", v)}
-                                                                    autoComplete="off"
-                                                                    placeholder={t.faqQuestionPlaceholder}
-                                                                />
-                                                                <TextField
-                                                                    label={t.faqAnswer}
-                                                                    value={faq.answer}
-                                                                    onChange={(v) => updateFaq(idx, "answer", v)}
-                                                                    autoComplete="off"
-                                                                    placeholder={t.faqAnswerPlaceholder}
-                                                                    multiline={2}
-                                                                />
-                                                            </BlockStack>
+                                                            <TextField
+                                                                label={t.faqQuestion}
+                                                                value={faq.question}
+                                                                onChange={(v) => updateFaq(idx, "question", v)}
+                                                                autoComplete="off"
+                                                                placeholder={t.faqQuestionPlaceholder}
+                                                            />
+                                                            <TextField
+                                                                label={t.faqAnswer}
+                                                                value={faq.answer}
+                                                                onChange={(v) => updateFaq(idx, "answer", v)}
+                                                                autoComplete="off"
+                                                                placeholder={t.faqAnswerPlaceholder}
+                                                                multiline={2}
+                                                            />
                                                         </BlockStack>
-                                                    </Card>
-                                                ))}
-                                                {faqItems.length < 10 && (
-                                                    <Button onClick={addFaq}>{t.faqAdd}</Button>
-                                                )}
-                                            </BlockStack>
-                                        )}
-                                    </BlockStack>
-                                )}
+                                                    </BlockStack>
+                                                </Card>
+                                            ))}
+                                            {faqItems.length < 10 && (
+                                                <Button onClick={addFaq}>{t.faqAdd}</Button>
+                                            )}
+                                        </BlockStack>
+                                    )}
+                                </BlockStack>
                             </BlockStack>
                         </Card>
                     </BlockStack>

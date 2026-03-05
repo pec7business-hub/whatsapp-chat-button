@@ -134,18 +134,10 @@ export default function Index() {
                   <Badge tone={isEnabled ? "success" : "warning"}>
                     {isEnabled ? "✓" : "✗"}
                   </Badge>
-                  <Badge tone={plan === "pro" ? "info" : "new"}>
-                    {plan === "pro" ? `✨ ${t.pro}` : t.free}
-                  </Badge>
                 </InlineStack>
               </BlockStack>
               <InlineStack gap="200">
                 <Button onClick={() => navigate("/app/settings")}>{tNav.settings}</Button>
-                {plan !== "pro" && (
-                  <Button variant="primary" onClick={() => navigate("/app/pricing")}>
-                    {t.upgradeCta}
-                  </Button>
-                )}
               </InlineStack>
             </InlineStack>
             {!hasPhoneNumber && (
@@ -208,20 +200,7 @@ export default function Index() {
           </Layout.Section>
         </Layout>
 
-        {/* Upgrade CTA for free plan */}
-        {plan !== "pro" && (
-          <Card>
-            <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">🚀 {t.upgradeCta}</Text>
-              <Text tone="subdued">
-                {t.upgradeBanner}
-              </Text>
-              <Button variant="primary" onClick={() => navigate("/app/pricing")}>
-                {t.upgradeCta} →
-              </Button>
-            </BlockStack>
-          </Card>
-        )}
+
       </BlockStack>
     </Page>
   );

@@ -3,63 +3,33 @@ import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 import { NavMenu } from "@shopify/app-bridge-react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
-import { authenticate, MONTHLY_PLAN } from "../shopify.server";
+import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { getTranslations } from "../translations";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export const loader = async ({ request }) => {
-  const { billing, session } = await authenticate.admin(request);
-
+  const { session } = await authenticate.admin(request);
   let language = "en";
 
-  // Check billing status
-  let billingStatus = { hasActivePayment: false, trialDaysLeft: null };
   try {
-    const { hasActivePayment, appSubscriptions } = await billing.check({
-      plans: [MONTHLY_PLAN],
-      isTest: true,
-    });
-    billingStatus.hasActivePayment = hasActivePayment;
+    const fallbackSettings = await db.settings.findUnique({ where: { shop: session.shop } });
+    if (fallbackSettings) {
+      language = fallbackSettings.language || "en";
 
-    const sub = appSubscriptions?.[0];
-    if (sub?.currentPeriodEnd) {
-      const diff = new Date(sub.currentPeriodEnd) - new Date();
-      billingStatus.trialDaysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-    }
-
-    // Sync billing state with our database
-    try {
-      const currentSettings = await db.settings.findUnique({ where: { shop: session.shop } });
-      if (currentSettings) {
-        language = currentSettings.language || "en";
-        const newPlan = hasActivePayment ? "pro" : "free";
-        if (currentSettings.plan !== newPlan) {
-          await db.settings.update({
-            where: { shop: session.shop },
-            data: { plan: newPlan },
-          });
-        }
+      // Ensure all users are marked as free plan in DB
+      if (fallbackSettings.plan !== "free") {
+        await db.settings.update({
+          where: { shop: session.shop },
+          data: { plan: "free" },
+        });
       }
-    } catch (e) {
-      console.error("Failed to sync billing state:", e);
     }
-  } catch {
-    // billing not configured yet, allow access
-    billingStatus.hasActivePayment = true;
-    try {
-      const fallbackSettings = await db.settings.findUnique({ where: { shop: session.shop } });
-      if (fallbackSettings) {
-        language = fallbackSettings.language || "en";
-      }
-    } catch (e) { }
-  }
+  } catch (e) { }
 
   return {
     apiKey: process.env.SHOPIFY_API_KEY || "",
-    hasActivePayment: billingStatus.hasActivePayment,
-    trialDaysLeft: billingStatus.trialDaysLeft,
     language,
   };
 };
