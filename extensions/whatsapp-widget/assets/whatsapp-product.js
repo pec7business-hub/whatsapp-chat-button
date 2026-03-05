@@ -58,7 +58,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             fetch(`${proxyUrl}/track-click`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ shop, deviceType: window.innerWidth <= 768 ? "mobile" : "desktop", page: window.location.pathname }),
+                body: JSON.stringify({
+                    shop,
+                    deviceType: window.innerWidth <= 768 ? "mobile" : "desktop",
+                    page: window.location.pathname,
+                    productTitle: productName
+                }),
             }).catch(() => { });
         });
     }

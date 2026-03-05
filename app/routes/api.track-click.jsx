@@ -14,7 +14,7 @@ export async function action({ request }) {
 
     try {
         const body = await request.json();
-        const { shop, deviceType = "unknown", page = "/" } = body;
+        const { shop, deviceType = "unknown", page = "/", productTitle } = body;
 
         if (!shop) {
             return json({ error: "Missing shop" }, { status: 400, headers: CORS_HEADERS });
@@ -26,6 +26,7 @@ export async function action({ request }) {
                 shop,
                 deviceType: deviceType || "unknown",
                 page: page || "/",
+                productTitle,
             },
         });
 

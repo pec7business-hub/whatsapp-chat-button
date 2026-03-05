@@ -89,9 +89,10 @@ model Settings {
 model ClickEvent {
   id         String   @id @default(uuid())
   shop       String
-  deviceType String   @default("unknown") // mobile, desktop
-  page       String   @default("/")
-  createdAt  DateTime @default(now())
+  deviceType   String   @default("unknown") // mobile, desktop
+  page         String   @default("/")
+  productTitle String?
+  createdAt    DateTime @default(now())
 
   @@index([shop, createdAt])
 }
